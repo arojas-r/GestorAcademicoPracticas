@@ -9,7 +9,8 @@ Create table if not exists Profesor(
     Apellido VARCHAR(60) NOT NULL,
     Telefono VARCHAR(15) NOT NULL,
     fecha_alta DATE NOT NULL,
-    fecha_baja DATE
+    fecha_baja DATE,
+    Estado_Profesor VARCHAR (40) NOT NULL
 );
 /*LA TABLA DE ALUMNOS CON SUS DATOS BASES*/
 Create table if not exists Alumno(
@@ -19,13 +20,15 @@ Create table if not exists Alumno(
     Apellido VARCHAR(60) NOT NULL,
     Telefono VARCHAR(15) NOT NULL,
     fecha_alta DATE NOT NULL,
-    fecha_baja DATE
+    fecha_baja DATE,
+    Estado_Alumno VARCHAR (40) NOT NULL
 );
 /*TABLA DE CURSO, EL DNIP HACE REFERENCIA AL DNI DEL PROFESOR PARA QUE SE PUEDA HACER LA CONSULTA DEL PROFESOR ASIGNADO EN LOS CURSOS*/
 Create table if not exists Curso(
     ID_Curso INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     Descripcion VARCHAR(80),
     Nombre_Curso VARCHAR(50),
+    Estado_Curso VARCHAR (40) NOT NULL,
     DNIP VARCHAR(9),
     fecha_inicio DATE,
     fecha_fin DATE,
@@ -39,6 +42,7 @@ Create table if not exists Matricula(
     ID_MAT VARCHAR(9) PRIMARY KEY NOT NULL,
     DNIA VARCHAR(9) NOT NULL,
     IDCURSO INT NOT NULL,
+    Estado_Matricula VARCHAR (40) NOT NULL,
     FOREIGN KEY (DNIA) REFERENCES Alumno(DNI) 
     ON DELETE CASCADE
     ON UPDATE CASCADE,
@@ -102,6 +106,7 @@ INSERT INTO Alumno (DNI, Cargo, Nombre, Apellido, Telefono, fecha_alta, fecha_ba
 ('26262626X', 'Estudiante', 'Mía', 'Soler Manzano', '644456555', '2021-12-24', NULL),
 ('27272727Y', 'Estudiante', 'Álvaro', 'Marín Rosales', '655567666', '2020-09-10', NULL),
 ('28282828Z', 'Estudiante', 'Julia', 'Saavedra Quintana', '666678888', '2023-06-06', NULL);
+
 
 
 DROP DATABASE INSTITUTO;
