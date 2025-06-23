@@ -196,6 +196,7 @@
                 <label for="fecha_inicio">Telefono:</label>
                 <input type="text" id="fecha_inicio" name="fecha_inicio" required>
 
+                
                 <label for="estado_del_curso">Estado del alumno:</label>
                 <select id="estado_del_curso" name="estado_del_curso" required>
                     <option value="Alta">Alta</option>
