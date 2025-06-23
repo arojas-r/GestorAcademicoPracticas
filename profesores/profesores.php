@@ -17,12 +17,88 @@
     <header>
         <h1>Gestión de Profesores</h1>
         <nav>
-            <button onclick="toggleSection('alta')">Alta Profesor</button>
-            <button onclick="toggleSection('baja')">Baja Profesor</button>
-            <button onclick="toggleSection('modificar')">Modificar Profesor</button>
             <button onclick="toggleSection('listado')">Listado Profesores</button>
+            <button onclick="toggleSection('alta')">Alta Profesor</button>
         </nav>
     </header>
+
+    <?php
+    // Conexión a la base de datos
+    $conn = new mysqli('localhost', 'usuario', 'contraseña', 'Instituto');
+
+    // Verificar conexión
+    if ($conn->connect_error) {
+        die("Conexión fallida: " . $conn->connect_error);
+    }
+    ?>
+
+    <!-- Listado Profesores (Sección predeterminada) -->
+    <section id="listado">
+        <h2>Listado de Profesores</h2>
+        <form method="POST" action="">
+            <label for="buscar_dni_listado">Introducir DNI del Profesor:</label>
+            <input type="text" id="buscar_dni_listado" name="buscar_dni_listado">
+            <button type="submit" name="buscar_listado">Buscar</button>
+        </form>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>DNI</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Estado Profesor</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Mostrar listado de profesores con los primeros 20 registros de la tabla Profesor -->
+                <?php
+                $query = "SELECT DNI, Nombre, Apellido, Estado_Profesor FROM Profesor LIMIT 20";
+                $result = $conn->query($query);
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        $estado_color = $row['Estado_Profesor'] === 'Activo' ? 'green' : 'red';
+                        echo "<tr>";
+                        echo "<td><a href='?dni=" . $row['DNI'] . "'>" . $row['DNI'] . "</a></td>";
+                        echo "<td>" . $row['Nombre'] . "</td>";
+                        echo "<td>" . $row['Apellido'] . "</td>";
+                        echo "<td style='color: $estado_color;'>" . $row['Estado_Profesor'] . "</td>";
+                        echo "</tr>";
+                    }
+                }
+                ?>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Ficha de Profesor -->
+    <section id="ficha_profesor" class="hidden">
+        <h2>Ficha del Profesor</h2>
+        <div id="detalle_profesor">
+            <!-- Mostrar los datos del profesor seleccionado -->
+            <?php
+            if (isset($_GET['dni'])) {
+                $dni = $_GET['dni'];
+                $query = "SELECT * FROM Profesor WHERE DNI='$dni'";
+                $result = $conn->query($query);
+                if ($result->num_rows > 0) {
+                    $profesor = $result->fetch_assoc();
+                    foreach ($profesor as $key => $value) {
+                        if ($key === 'Estado_Profesor') {
+                            $estado_color = $value === 'Activo' ? 'green' : 'red';
+                            echo "<p><strong>$key:</strong> <span style='color: $estado_color;'>$value</span></p>";
+                        } else {
+                            echo "<p><strong>$key:</strong> $value</p>";
+                        }
+                    }
+                }
+            }
+            ?>
+        </div>
+
+        <button onclick="toggleSection('modificar')">Modificar Profesor</button>
+        <button onclick="toggleSection('baja')">Baja Profesor</button>
+    </section>
 
     <!-- Alta Profesor -->
     <section id="alta" class="hidden">
@@ -49,6 +125,8 @@
             <label for="fecha_baja">Fecha Baja:</label>
             <input type="date" id="fecha_baja" name="fecha_baja">
 
+            <input type="hidden" name="estado_profesor" value="Activo">
+
             <button type="submit" name="guardar_alta">Guardar Cambios</button>
         </form>
     </section>
@@ -56,46 +134,46 @@
     <!-- Baja Profesor -->
     <section id="baja" class="hidden">
         <h2>Baja de Profesor</h2>
+        <p>¿Estás seguro de que quieres dar de baja a este profesor?</p>
         <form method="POST" action="">
-            <label for="buscar_dni_baja">Buscar por DNI:</label>
-            <input type="text" id="buscar_dni_baja" name="buscar_dni_baja" required>
-            <button type="submit" name="buscar_baja">Buscar</button>
+            <input type="hidden" id="dni_baja" name="dni_baja" value="">
+            <input type="hidden" name="fecha_baja" value="<?php echo date('Y-m-d'); ?>">
+            <input type="hidden" name="estado_profesor" value="Baja">
+            <button type="submit" name="confirmar_baja">Confirmar Baja</button>
         </form>
-
-        <div id="resultado_baja">
-            <!-- Mostrar datos del profesor encontrado -->
-            <!-- Incluir botón para confirmar baja -->
-        </div>
     </section>
 
     <!-- Modificar Profesor -->
     <section id="modificar" class="hidden">
         <h2>Modificar Profesor</h2>
         <form method="POST" action="">
-            <label for="buscar_dni_modificar">Buscar por DNI:</label>
-            <input type="text" id="buscar_dni_modificar" name="buscar_dni_modificar" required>
-            <button type="submit" name="buscar_modificar">Buscar</button>
-        </form>
+            <label for="cargo">Cargo:</label>
+            <input type="text" id="cargo_modificar" name="cargo" required>
 
-        <div id="resultado_modificar">
-            <!-- Mostrar formulario con datos del profesor para modificar -->
-        </div>
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre_modificar" name="nombre" required>
+
+            <label for="apellido">Apellido:</label>
+            <input type="text" id="apellido_modificar" name="apellido" required>
+
+            <label for="telefono">Teléfono:</label>
+            <input type="text" id="telefono_modificar" name="telefono" required>
+
+            <label for="fecha_alta">Fecha Alta:</label>
+            <input type="date" id="fecha_alta_modificar" name="fecha_alta" required>
+
+            <label for="fecha_baja">Fecha Baja:</label>
+            <input type="date" id="fecha_baja_modificar" name="fecha_baja">
+
+            <p>Estado: <span id="estado_profesor_modificar" style="color: red;">Baja</span></p>
+
+            <button type="submit" name="guardar_modificacion">Guardar Cambios</button>
+        </form>
     </section>
 
-    <!-- Listado Profesores -->
-    <section id="listado" class="hidden">
-        <h2>Listado de Profesores</h2>
-        <form method="POST" action="">
-            <label for="buscar_dni_listado">Buscar por DNI:</label>
-            <input type="text" id="buscar_dni_listado" name="buscar_dni_listado">
-            <button type="submit" name="buscar_listado">Buscar</button>
-        </form>
-
-        <div id="tabla_listado">
-            <!-- Mostrar listado de profesores -->
-        </div>
-    </section>
-
+    <footer>
+        <p>Gestión de Profesores &copy; 2025</p>
+    </footer>
 </body>
 </html>
 
@@ -116,5 +194,8 @@ nav button { margin-right: 10px; padding: 10px; cursor: pointer; }
 section { padding: 1rem; margin-top: 1rem; }
 .hidden { display: none; }
 form { margin-top: 10px; }
+table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+th { background-color: #f4f4f4; }
 footer { text-align: center; padding: 1rem; background: #f1f1f1; margin-top: 2rem; }
 </style>
