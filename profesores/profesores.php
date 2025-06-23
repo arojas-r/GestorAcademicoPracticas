@@ -1,201 +1,230 @@
-<?php
-// profesores.php
-
-// Este archivo contiene las funcionalidades de Alta, Baja, Modificar y Listado de Profesores.
-?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Profesores</title>
-    <link rel="stylesheet" href="styles.css"> <!-- CSS externo -->
-    <script src="script.js" defer></script> <!-- JS externo -->
+    <title>Gestión de profesores</title>
+    <link rel="stylesheet" href="profesores.css">
 </head>
 <body>
-    <header>
-        <h1>Gestión de Profesores</h1>
-        <nav>
-            <button onclick="toggleSection('listado')">Listado Profesores</button>
-            <button onclick="toggleSection('alta')">Alta Profesor</button>
-        </nav>
-    </header>
+    <h1>Gestión de Profesores</h1>
 
     <?php
-    // Conexión a la base de datos
-    $conn = new mysqli('localhost', 'usuario', 'contraseña', 'Instituto');
+    session_start();
 
-    // Verificar conexión
-    if ($conn->connect_error) {
-        die("Conexión fallida: " . $conn->connect_error);
+    if (!isset($_SESSION['profesor'])) {
+        $_SESSION['profesor'] = [
+            [
+                'DNI' => "45983322C",
+                'Nombre' => 'Benito',
+                'Apellido' => 'Cuerdo',
+                'Teléfono' => '655732493',
+                'Estado_Profesor' => 'Alta',
+                'Fecha_Alta' => '2026-03-01',
+                'Fecha_Baja' => ''
+            ],
+            [
+                'DNI' => "12345678A",
+                'Nombre' => 'Ana',
+                'Apellido' => 'García',
+                'Teléfono' => '600112233',
+                'Estado_Profesor' => 'Alta',
+                'Fecha_Alta' => '2025-09-01',
+                'Fecha_Baja' => ''
+            ]
+        ];
+    }
+
+    if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id'])) {
+        $id_to_delete = $_GET['id'];
+        $profesores_actualizados = [];
+        foreach ($_SESSION['profesor'] as $profesor) {
+            if ($profesor['DNI'] !== $id_to_delete) {
+                $profesores_actualizados[] = $profesor;
+            }
+        }
+        $_SESSION['profesor'] = $profesores_actualizados;
+        header('Location: ' . $_SERVER['PHP_SELF']);
+        exit();
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $dni = htmlspecialchars($_POST['DNI']);
+        $nombre = htmlspecialchars($_POST['Nombre']);
+        $apellido = htmlspecialchars($_POST['Apellido']);
+        $telefono = htmlspecialchars($_POST['Teléfono']);
+        $fecha_alta = htmlspecialchars($_POST['Fecha_Alta']);
+        $estado_profesor = in_array($_POST['Estado_Profesor'], ['Alta', 'Baja']) ? $_POST['Estado_Profesor'] : 'Alta';
+        $fecha_baja = htmlspecialchars($_POST['Fecha_Baja']);
+        
+        $is_edit = isset($_POST['is_edit']) && !empty($_POST['is_edit']);
+        
+        if ($is_edit) {
+            foreach ($_SESSION['profesor'] as &$profesor) {
+                if ($profesor['DNI'] === $dni) {
+                    $profesor['Nombre'] = $nombre;
+                    $profesor['Apellido'] = $apellido;
+                    $profesor['Teléfono'] = $telefono;
+                    $profesor['Fecha_Alta'] = $fecha_alta;
+                    $profesor['Estado_Profesor'] = $estado_profesor;
+                    $profesor['Fecha_Baja'] = $fecha_baja;
+                    break;
+                }
+            }
+            unset($profesor);
+        } else {
+            $_SESSION['profesor'][] = [
+                'DNI' => $dni,
+                'Nombre' => $nombre,
+                'Apellido' => $apellido,
+                'Teléfono' => $telefono,
+                'Fecha_Alta' => $fecha_alta,
+                'Estado_Profesor' => $estado_profesor,
+                'Fecha_Baja' => $fecha_baja
+            ];
+        }
+        header('Location: ' . $_SERVER['PHP_SELF']);
+        exit();
+    }
+
+    $profesores_filtrados = $_SESSION['profesor'];
+
+    if (isset($_GET['search_dni']) && !empty($_GET['search_dni'])) {
+        $search_dni = $_GET['search_dni'];
+        $profesores_filtrados = array_filter($_SESSION['profesor'], function($profesor) use ($search_dni) {
+            return stristr($profesor['DNI'], $search_dni) || stristr($profesor['Nombre'], $search_dni) || stristr($profesor['Apellido'], $search_dni);
+        });
     }
     ?>
 
-    <!-- Listado Profesores (Sección predeterminada) -->
-    <section id="listado">
-        <h2>Listado de Profesores</h2>
-        <form method="POST" action="">
-            <label for="buscar_dni_listado">Introducir DNI del Profesor:</label>
-            <input type="text" id="buscar_dni_listado" name="buscar_dni_listado">
-            <button type="submit" name="buscar_listado">Buscar</button>
+    <div class="search-container">
+        <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="GET" style="display: flex; width: 100%;">
+            <input type="text" name="search_dni" placeholder="Buscar profesor por DNI, Nombre o Apellido..." value="<?php echo isset($_GET['search_dni']) ? htmlspecialchars($_GET['search_dni']) : ''; ?>">
+            <button type="submit">Buscar</button>
         </form>
+    </div>
 
-        <table>
-            <thead>
+    <table>
+        <thead>
+            <tr>
+                <th>DNI</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Teléfono</th>
+                <th>Fecha de Alta</th>
+                <th>Estado del Profesor</th>
+                <th>Fecha de Baja</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (empty($profesores_filtrados)): ?>
                 <tr>
-                    <th>DNI</th>
-                    <th>Nombre</th>
-                    <th>Apellido</th>
-                    <th>Estado Profesor</th>
+                    <td colspan="8">No se encontraron profesores.</td>
                 </tr>
-            </thead>
-            <tbody>
-                <!-- Mostrar listado de profesores con los primeros 20 registros de la tabla Profesor -->
-                <?php
-                $query = "SELECT DNI, Nombre, Apellido, Estado_Profesor FROM Profesor LIMIT 20";
-                $result = $conn->query($query);
-                if ($result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
-                        $estado_color = $row['Estado_Profesor'] === 'Activo' ? 'green' : 'red';
-                        echo "<tr>";
-                        echo "<td><a href='?dni=" . $row['DNI'] . "'>" . $row['DNI'] . "</a></td>";
-                        echo "<td>" . $row['Nombre'] . "</td>";
-                        echo "<td>" . $row['Apellido'] . "</td>";
-                        echo "<td style='color: $estado_color;'>" . $row['Estado_Profesor'] . "</td>";
-                        echo "</tr>";
-                    }
-                }
-                ?>
-            </tbody>
-        </table>
-    </section>
+            <?php else: ?>
+                <?php foreach ($profesores_filtrados as $profesor): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($profesor['DNI']); ?></td>
+                        <td><?php echo htmlspecialchars($profesor['Nombre']); ?></td>
+                        <td><?php echo htmlspecialchars($profesor['Apellido']); ?></td>
+                        <td><?php echo htmlspecialchars($profesor['Teléfono'] ?? '-'); ?></td>
+                        <td><?php echo htmlspecialchars($profesor['Fecha_Alta']); ?></td>
+                        <td><?php echo htmlspecialchars($profesor['Estado_Profesor']); ?></td>
+                        <td><?php echo htmlspecialchars($profesor['Fecha_Baja'] ?? '-'); ?></td>
+                        <td class="actions">
+                            <button class="btn btn-delete" onclick="if(confirm('¿Estás seguro de eliminar este profesor?')) { window.location.href='<?php echo $_SERVER['PHP_SELF']; ?>?action=delete&id=<?php echo $profesor['DNI']; ?>'; }">Eliminar datos</button>
+                            <button class="btn btn-modify" onclick="showForm(<?php echo htmlspecialchars(json_encode($profesor)); ?>)">Modificar datos</button>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </tbody>
+    </table>
 
-    <!-- Ficha de Profesor -->
-    <section id="ficha_profesor" class="hidden">
-        <h2>Ficha del Profesor</h2>
-        <div id="detalle_profesor">
-            <!-- Mostrar los datos del profesor seleccionado -->
-            <?php
-            if (isset($_GET['dni'])) {
-                $dni = $_GET['dni'];
-                $query = "SELECT * FROM Profesor WHERE DNI='$dni'";
-                $result = $conn->query($query);
-                if ($result->num_rows > 0) {
-                    $profesor = $result->fetch_assoc();
-                    foreach ($profesor as $key => $value) {
-                        if ($key === 'Estado_Profesor') {
-                            $estado_color = $value === 'Activo' ? 'green' : 'red';
-                            echo "<p><strong>$key:</strong> <span style='color: $estado_color;'>$value</span></p>";
-                        } else {
-                            echo "<p><strong>$key:</strong> $value</p>";
-                        }
-                    }
-                }
-            }
-            ?>
+    <button class="btn btn-add" onclick="showForm()">Dar de Alta</button>
+
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-button" onclick="hideForm()">&times;</span>
+            <h2 id="formTitle">Añadir/Modificar Profesor</h2>
+            <form id="profesorForm" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
+                <input type="hidden" id="is_edit" name="is_edit" value="">
+
+                <label for="DNI">DNI:</label>
+                <input type="text" id="DNI" name="DNI" required>
+
+                <label for="Nombre">Nombre:</label>
+                <input type="text" id="Nombre" name="Nombre" required>
+
+                <label for="Apellido">Apellido:</label>
+                <input type="text" id="Apellido" name="Apellido" required>
+                
+                <label for="Teléfono">Teléfono:</label>
+                <input type="text" id="Teléfono" name="Teléfono" required>
+
+                <label for="Fecha_Alta">Fecha de Alta:</label>
+                <input type="date" id="Fecha_Alta" name="Fecha_Alta" required>
+
+                <label for="Estado_Profesor">Estado del Profesor:</label>
+                <select id="Estado_Profesor" name="Estado_Profesor" required>
+                    <option value="Alta">Alta</option>
+                    <option value="Baja">Baja</option>
+                </select>
+
+                <label for="Fecha_Baja">Fecha de Baja:</label>
+                <input type="date" id="Fecha_Baja" name="Fecha_Baja">
+
+                <button type="submit" id="submitButton">Guardar</button>
+                <button type="button" class="btn btn-cancel" onclick="hideForm()">Cancelar</button>
+            </form>
         </div>
+    </div>
 
-        <button onclick="toggleSection('modificar')">Modificar Profesor</button>
-        <button onclick="toggleSection('baja')">Baja Profesor</button>
-    </section>
+    <script>
+        function showForm(profesor = null) {
+            const modalOverlay = document.getElementById('modalOverlay');
+            const form = document.getElementById('profesorForm');
+            const submitButton = document.getElementById('submitButton');
+            const formTitle = document.getElementById('formTitle');
+            const dniInput = document.getElementById('DNI');
 
-    <!-- Alta Profesor -->
-    <section id="alta" class="hidden">
-        <h2>Alta de Profesor</h2>
-        <form method="POST" action="">
-            <label for="dni">DNI:</label>
-            <input type="text" id="dni" name="dni" required>
+            modalOverlay.style.display = 'flex';
 
-            <label for="cargo">Cargo:</label>
-            <input type="text" id="cargo" name="cargo" required>
+            if (profesor) {
+                formTitle.textContent = 'Modificar Profesor';
+                submitButton.textContent = 'Modificar';
+                
+                document.getElementById('is_edit').value = profesor.DNI;
+                dniInput.value = profesor.DNI;
+                dniInput.readOnly = true;
+                
+                document.getElementById('Nombre').value = profesor.Nombre;
+                document.getElementById('Apellido').value = profesor.Apellido;
+                document.getElementById('Teléfono').value = profesor.Teléfono ?? '';
+                document.getElementById('Fecha_Alta').value = profesor.Fecha_Alta;
+                document.getElementById('Estado_Profesor').value = profesor.Estado_Profesor;
+                document.getElementById('Fecha_Baja').value = profesor.Fecha_Baja ?? '';
+                
+            } else {
+                formTitle.textContent = 'Añadir Profesor';
+                submitButton.textContent = 'Añadir';
+                form.reset();
+                document.getElementById('is_edit').value = '';
+                dniInput.readOnly = false;
+                document.getElementById('Estado_Profesor').value = 'Alta';
+            }
+        }
 
-            <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre" name="nombre" required>
+        function hideForm() {
+            document.getElementById('modalOverlay').style.display = 'none';
+        }
 
-            <label for="apellido">Apellido:</label>
-            <input type="text" id="apellido" name="apellido" required>
-
-            <label for="telefono">Teléfono:</label>
-            <input type="text" id="telefono" name="telefono" required>
-
-            <label for="fecha_alta">Fecha Alta:</label>
-            <input type="date" id="fecha_alta" name="fecha_alta" required>
-
-            <label for="fecha_baja">Fecha Baja:</label>
-            <input type="date" id="fecha_baja" name="fecha_baja">
-
-            <input type="hidden" name="estado_profesor" value="Activo">
-
-            <button type="submit" name="guardar_alta">Guardar Cambios</button>
-        </form>
-    </section>
-
-    <!-- Baja Profesor -->
-    <section id="baja" class="hidden">
-        <h2>Baja de Profesor</h2>
-        <p>¿Estás seguro de que quieres dar de baja a este profesor?</p>
-        <form method="POST" action="">
-            <input type="hidden" id="dni_baja" name="dni_baja" value="">
-            <input type="hidden" name="fecha_baja" value="<?php echo date('Y-m-d'); ?>">
-            <input type="hidden" name="estado_profesor" value="Baja">
-            <button type="submit" name="confirmar_baja">Confirmar Baja</button>
-        </form>
-    </section>
-
-    <!-- Modificar Profesor -->
-    <section id="modificar" class="hidden">
-        <h2>Modificar Profesor</h2>
-        <form method="POST" action="">
-            <label for="cargo">Cargo:</label>
-            <input type="text" id="cargo_modificar" name="cargo" required>
-
-            <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre_modificar" name="nombre" required>
-
-            <label for="apellido">Apellido:</label>
-            <input type="text" id="apellido_modificar" name="apellido" required>
-
-            <label for="telefono">Teléfono:</label>
-            <input type="text" id="telefono_modificar" name="telefono" required>
-
-            <label for="fecha_alta">Fecha Alta:</label>
-            <input type="date" id="fecha_alta_modificar" name="fecha_alta" required>
-
-            <label for="fecha_baja">Fecha Baja:</label>
-            <input type="date" id="fecha_baja_modificar" name="fecha_baja">
-
-            <p>Estado: <span id="estado_profesor_modificar" style="color: red;">Baja</span></p>
-
-            <button type="submit" name="guardar_modificacion">Guardar Cambios</button>
-        </form>
-    </section>
-
-    <footer>
-        <p>Gestión de Profesores &copy; 2025</p>
-    </footer>
+        document.getElementById('modalOverlay').addEventListener('click', function(event) {
+            if (event.target === this) {
+                hideForm();
+            }
+        });
+    </script>
 </body>
 </html>
-
-<script>
-// Mostrar/Ocultar secciones
-function toggleSection(sectionId) {
-    const sections = document.querySelectorAll('section');
-    sections.forEach(section => section.classList.add('hidden'));
-    document.getElementById(sectionId).classList.remove('hidden');
-}
-</script>
-
-<style>
-/* Estilos básicos */
-body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-header { background: #007bff; color: white; padding: 1rem; }
-nav button { margin-right: 10px; padding: 10px; cursor: pointer; }
-section { padding: 1rem; margin-top: 1rem; }
-.hidden { display: none; }
-form { margin-top: 10px; }
-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-th { background-color: #f4f4f4; }
-footer { text-align: center; padding: 1rem; background: #f1f1f1; margin-top: 2rem; }
-</style>
