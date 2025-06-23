@@ -4,10 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Cursos</title>
-    <link rel="stylesheet" href="cursos.css">
+    <link rel="stylesheet" href="style.css">
+
 </head>
 <body>
-    <h1>Gestión de Cursos</h1>
+
+    <header>
+        <div class="logo"><a href="index.php">📚 Instituto</a></div>
+        <nav>
+            <a href="alumnos.php">Alumnos</a>
+            <a href="profesores.php">Profesores</a>
+            <a href="cursos.php">Cursos</a>
+            <a href="matriculas.php">Matrículas</a>
+            <a href="consultas.php">Consultar</a>
+        </nav>
+    </header>
+    <div class="breadcrumbs">
+        <a href="index.php">Inicio</a> &raquo; <span>Cursos</span>
+    </div>
+
+    <main>
+    <h1>CURSOS</h1>
+    <h2>Tabla de contenidos. Grupos Colon IECM</h2>
 
     <?php
     // Simulación de una base de datos con un array
@@ -20,7 +38,7 @@
                 'Nombre' => 'Desarrollo Web Full Stack',
                 'Profesor_asignado' => 'Juan Pérez',
                 'Fecha_inicio' => '2025-09-01',
-                'Estado_del_curso' => 'Alta', // Modificado a 'Alta'
+                'Estado_del_curso' => 'Alta',
                 'Fecha_final' => '2026-03-01'
             ],
             [
@@ -28,7 +46,7 @@
                 'Nombre' => 'Introducción a la Ciencia de Datos',
                 'Profesor_asignado' => 'María García',
                 'Fecha_inicio' => '2025-10-15',
-                'Estado_del_curso' => 'Alta', // Modificado a 'Alta'
+                'Estado_del_curso' => 'Alta',
                 'Fecha_final' => '2026-02-15'
             ],
             [
@@ -36,7 +54,7 @@
                 'Nombre' => 'Diseño Gráfico Avanzado',
                 'Profesor_asignado' => 'Carlos Ruíz',
                 'Fecha_inicio' => '2025-08-01',
-                'Estado_del_curso' => 'Baja', // Modificado a 'Baja'
+                'Estado_del_curso' => 'Baja',
                 'Fecha_final' => '2024-12-01'
             ]
         ];
@@ -178,6 +196,12 @@
             </form>
         </div>
     </div>
+
+    </main>
+
+    <footer>
+        &copy; <?php echo date("Y"); ?> Instituto de Educación Superior. Todos los derechos reservados.
+    </footer>
 
     <script>
         function showForm(curso = null) {
