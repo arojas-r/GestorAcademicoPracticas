@@ -10,16 +10,16 @@
 
 <main>
     <div class="header-container">
-        <h1>Área del Alumno</h1>
+        <h1 class="titulo-alumno">Área del Alumno</h1>
         <div class="btn-group">
-            <button onclick="toggleSection('formAlta')">Dame de Alta</button>
-            <button onclick="toggleSection('formGestion')">Gestionar Datos</button>
+            <button  class="btn-toggle" onclick="toggleSection('formAlta')">Dame de Alta</button>
+            <button  class="btn-toggle" onclick="toggleSection('formGestion')">Gestionar Datos</button>
         </div>
     </div>
 
-    <p>Bienvenido al área del alumno. Aquí puedes gestionar tus datos y ver tu progreso.</p>
+    <p class="descripcion-alumno">Bienvenido al área del alumno. Aquí puedes gestionar tus datos y ver tu progreso.</p>
 
-    <section id="formAlta" class="hidden toggle-section">
+    <section id="formAlta" class="hidden toggle-section form-alta">
         <form action="" method="post">
             <label for="nombre1">Nombre:</label>
             <input type="text" id="nombre1" name="nombre1" required>
@@ -37,8 +37,8 @@
         </form>
     </section>
 
-    <section id="formGestion" class="hidden toggle-section">
-        <p>Aquí puedes gestionar tus datos.</p>
+    <section id="formGestion" class="hidden toggle-section form-gestion">
+        <p class="descripcion-gestion">Aquí puedes gestionar tus datos.</p>
         
     <?php
     // Simulación de una base de datos con un array
