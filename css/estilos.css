@@ -6,3 +6,264 @@
     border: 1px solid black;
     background-color: #f9f9f9;
 }
+:root {
+    --background: #f7f9ff;
+    --thtable: #036;
+    --modify: #f79007;
+    --buton: #D27C32;
+    --delete: rgb(0, 20, 41);
+    --table1: #d4ecff;
+    --table2:  rgb(39, 70, 100);
+    --border: #ffffff;
+
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: var(--background);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: var(--table1);
+    box-shadow: 0px 0px 3px 5px var(--table1);
+}
+
+th,
+td {
+    padding: 10px;
+    border: 1px solid var(--border);
+    text-align: left;
+}
+
+th {
+    background-color: var(--thtable);
+    color: var(--background);
+    font-weight: 900;
+    font-size: 20px;
+}
+
+td {
+    font-weight: 500;
+}
+
+tr:nth-child(even) {
+    background-color: var(--table2);
+    color: var(--background);
+}
+
+.actions {
+    display: flex;
+    gap: 5px;
+}
+
+.btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    color: var(--background);
+}
+
+.btn-delete {
+    background-color: var(--delete);
+}
+
+.btn-modify {
+    background-color: var(--modify);
+    color: var(--table1);
+}
+
+.btn-add {
+    background-color: var(--buton);
+    margin-bottom: 20px;
+}
+
+.search-container {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.search-container input[type="text"] {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.search-container button {
+    padding: 10px 15px;
+    background-color: var(--buton);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Estilos para el modal */
+.modal-overlay {
+    display: none;
+    /* Oculto por defecto */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Fondo semitransparente */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    /* Asegura que esté encima de todo */
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.modal-content label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.modal-content input[type="text"],
+.modal-content input[type="date"],
+.modal-content select {
+    /* Añadido estilo para select */
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.modal-content button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.modal-content .btn-cancel {
+    background-color: #6c757d;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #aaa;
+}
+
+.close-button:hover {
+    color: #333;
+}
+
+/* estilo para alumnos*/
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.btn-group {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-toggle {
+    background-color: var(--buton);
+    color: var(--background);
+    border: none;
+    border-radius: 4px;
+    padding: 10px 18px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-toggle:hover {
+    background-color: var(--modify);
+    color: var(--table1);
+}
+
+.toggle-section {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    background-color: #f9f9f9;
+    border-radius: 6px;
+}
+
+.form-alta label,
+.form-gestion label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+.form-alta input[type="text"],
+.form-gestion input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.form-alta button,
+.form-gestion button {
+    background-color: var(--buton);
+    color: var(--background);
+    border: none;
+    border-radius: 4px;
+    padding: 10px 18px;
+    font-size: 1em;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.form-alta button:hover,
+.form-gestion button:hover {
+    background-color: var(--modify);
+    color: var(--table1);
+}
+.titulo-alumno {
+    color: var(--thtable);
+    font-size: 2.2em;
+    font-weight: 900;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+.descripcion-alumno {
+    color: #333;
+    font-size: 1.1em;
+    margin-bottom: 18px;
+    line-height: 1.5;
+}
