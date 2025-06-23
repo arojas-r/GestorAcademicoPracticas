@@ -25,7 +25,7 @@ Create table if not exists Alumno(
 );
 /*TABLA DE CURSO, EL DNIP HACE REFERENCIA AL DNI DEL PROFESOR PARA QUE SE PUEDA HACER LA CONSULTA DEL PROFESOR ASIGNADO EN LOS CURSOS*/
 Create table if not exists Curso(
-    ID_Curso INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    ID_Curso VARCHAR(8) PRIMARY KEY NOT NULL,
     Descripcion VARCHAR(80),
     Nombre_Curso VARCHAR(50),
     Estado_Curso VARCHAR (40) NOT NULL,
@@ -39,9 +39,9 @@ Create table if not exists Curso(
 );
 /*TABLA DE MATRICULA EL CUAL CONECTA LOS DATOS DEL ALUMNO CON EL CURSO*/
 Create table if not exists Matricula(
-    ID_MAT VARCHAR(9) PRIMARY KEY NOT NULL,
+    ID_MAT INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     DNIA VARCHAR(9) NOT NULL,
-    IDCURSO INT NOT NULL,
+    IDCURSO VARCHAR(8) NOT NULL,
     Estado_Matricula VARCHAR (40) NOT NULL,
     FOREIGN KEY (DNIA) REFERENCES Alumno(DNI) 
     ON DELETE CASCADE
@@ -52,7 +52,7 @@ Create table if not exists Matricula(
 );
 
 
-INSERT INTO Profesor (DNI, Cargo, Nombre, Apellido, Telefono, fecha_alta, fecha_baja) VALUES
+INSERT INTO Profesor (DNI, Cargo, Nombre, Apellido, Telefono, fecha_alta, fecha_baja, Estado_Profesor) VALUES
 ('12345678A', 'Profesor', 'Luis', 'García Pérez', '600123456', '2020-09-01', NULL, 'ALTA'),
 ('23456789B', 'Profesor', 'Ana', 'López Díaz', '611234567', '2021-01-15', NULL, 'ALTA'),
 ('34567890C', 'Profesor', 'Jorge', 'Martín Ruiz', '622345678', '2019-06-10', NULL, 'ALTA'),
@@ -79,7 +79,7 @@ INSERT INTO Profesor (DNI, Cargo, Nombre, Apellido, Telefono, fecha_alta, fecha_
 ('24234567X', 'Profesor', 'Patricia', 'Nieto Valdés', '644456789', '2016-12-01', NULL, 'ALTA'),
 ('25234567Y', 'Profesor', 'Sergio', 'Pérez Lara', '655567890', '2021-07-20', NULL, 'ALTA');
 
-INSERT INTO Alumno (DNI, Cargo, Nombre, Apellido, Telefono, fecha_alta, fecha_baja) VALUES
+INSERT INTO Alumno (DNI, Cargo, Nombre, Apellido, Telefono, fecha_alta, fecha_baja, Estado_Alumno) VALUES
 ('11111111A', 'Estudiante', 'Valeria', 'Domínguez Alba', '600123100', '2022-09-01', NULL, 'ALTA'),
 ('22222222B', 'Estudiante', 'Mateo', 'Fuentes Bravo', '611234200', '2023-01-10', NULL, 'ALTA'),
 ('33333333C', 'Estudiante', 'Camila', 'Navarro Solís', '622345300', '2021-08-25', NULL, 'ALTA'),
@@ -107,11 +107,26 @@ INSERT INTO Alumno (DNI, Cargo, Nombre, Apellido, Telefono, fecha_alta, fecha_ba
 ('27272727Y', 'Estudiante', 'Álvaro', 'Marín Rosales', '655567666', '2020-09-10', NULL, 'ALTA'),
 ('28282828Z', 'Estudiante', 'Julia', 'Saavedra Quintana', '666678888', '2023-06-06', NULL, 'ALTA');
 
-INSERT INTO Curso (Descripcion, Nombre_Curso, Estado_Curso, DNIP, fecha_inicio, fecha_fin) VALUES
-('CURSO PARA DESEMPLEADOS, SUBCONVENCIONADO POR EL SEPE. "IFCD0210 DESARROLLO DE APLICACIONES CON TECNOLOGIAS WEB"','DESARROLLO DE APLICACIONES CON TECNOLOGIAS WEB','ALTA','12345678A','2025-01-28','2025-06-03');
+
+INSERT INTO Curso (ID_Curso, Descripcion, Nombre_Curso, Estado_Curso, DNIP, fecha_inicio, fecha_fin) VALUES
+('IFCD0210','CURSO PARA DESEMPLEADOS, SUBCONVENCIONADO POR EL SEPE. "IFCD0210 DESARROLLO DE APLICACIONES CON TECNOLOGIAS WEB"','DESARROLLO DE APLICACIONES CON TECNOLOGIAS WEB','ALTA','12345678A','2025-01-28','2025-06-03');
+INSERT INTO Curso (ID_Curso, Descripcion, Nombre_Curso, Estado_Curso, DNIP, fecha_inicio, fecha_fin) VALUES
+('IFCD0220','CURSO PARA DESEMPLEADOS, SUBCONVENCIONADO POR EL SEPE. "IFCD0220 SISTEMA DE GESTIÓN DE INFORMACIÓN"','SISTEMA DE GESTIÓN DE INFORMACIÓN','ALTA','12345678A','2025-01-28','2025-06-03');
+INSERT INTO MATRICULA(DNIA, IDCURSO, Estado_Matricula) VALUES
+('28282828Z', 'IFCD0220' ,'ALTA'),
+('27272727Y', 'IFCD0220' ,'ALTA'),
+('26262626X', 'IFCD0220' ,'ALTA'),
+('25252525W', 'IFCD0220' ,'ALTA'),
+('24242424V', 'IFCD0220' ,'ALTA'),
+('23232323U', 'IFCD0210' ,'ALTA'),
+('21212121T', 'IFCD0210' ,'ALTA'),
+('20202020S', 'IFCD0210' ,'ALTA'),
+('19191919R', 'IFCD0210' ,'ALTA');
+
 
 SELECT NOMBRE, APELLIDO, TELEFONO FROM ALUMNO;
 SELECT NOMBRE, APELLIDO, TELEFONO FROM PROFESOR;
 SELECT * FROM PROFESOR WHERE 
 
 SELECT * FROM CURSO;
+select * from matricula where IDCURSO="IFCD0220";
