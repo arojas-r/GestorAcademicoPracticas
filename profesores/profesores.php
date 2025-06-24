@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de profesores</title>
-    <link rel="stylesheet" href="profesores.css">
+    <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
     <h1>Gestión de Profesores</h1>
