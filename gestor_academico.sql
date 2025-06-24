@@ -1,8 +1,9 @@
-create database if not exists Instituto;
+create database if not exists instituto;
 
-Use Instituto;
-/*LA TABLA DE PROFESOR CON SUS DATOS BASES*/
-Create table if not exists Profesor(
+USE instituto;
+
+-- TABLA DE PROFESOR
+CREATE TABLE IF NOT EXISTS Profesor(
     DNI VARCHAR(9) PRIMARY KEY NOT NULL, 
     Cargo VARCHAR(15) NOT NULL,
     Nombre VARCHAR(30) NOT NULL,
@@ -10,10 +11,11 @@ Create table if not exists Profesor(
     Telefono VARCHAR(15) NOT NULL,
     fecha_alta DATE NOT NULL,
     fecha_baja DATE,
-    Estado_Profesor VARCHAR (40) NOT NULL
+    Estado_Profesor VARCHAR(40) NOT NULL
 );
-/*LA TABLA DE ALUMNOS CON SUS DATOS BASES*/
-Create table if not exists Alumno(
+
+-- TABLA DE ALUMNOS
+CREATE TABLE IF NOT EXISTS Alumno(
     DNI VARCHAR(9) PRIMARY KEY NOT NULL,
     Cargo VARCHAR(15) NOT NULL,
     Nombre VARCHAR(30) NOT NULL,
@@ -21,37 +23,38 @@ Create table if not exists Alumno(
     Telefono VARCHAR(15) NOT NULL,
     fecha_alta DATE NOT NULL,
     fecha_baja DATE,
-    Estado_Alumno VARCHAR (40) NOT NULL
+    Estado_Alumno VARCHAR(40) NOT NULL
 );
-/*TABLA DE CURSO, EL DNIP HACE REFERENCIA AL DNI DEL PROFESOR PARA QUE SE PUEDA HACER LA CONSULTA DEL PROFESOR ASIGNADO EN LOS CURSOS*/
-Create table if not exists Curso(
+
+-- TABLA DE CURSO
+CREATE TABLE IF NOT EXISTS Curso(
     ID_Curso VARCHAR(8) PRIMARY KEY NOT NULL,
-    Descripcion VARCHAR(80),
+    Descripcion VARCHAR(150),
     Nombre_Curso VARCHAR(50),
-    Estado_Curso VARCHAR (40) NOT NULL,
+    Estado_Curso VARCHAR(40) NOT NULL,
     DNIP VARCHAR(9),
     fecha_inicio DATE,
     fecha_fin DATE,
     FOREIGN KEY (DNIP) REFERENCES Profesor(DNI) 
-    ON DELETE CASCADE 
-    ON UPDATE CASCADE
-
+        ON DELETE CASCADE 
+        ON UPDATE CASCADE
 );
-/*TABLA DE MATRICULA EL CUAL CONECTA LOS DATOS DEL ALUMNO CON EL CURSO*/
-Create table if not exists Matricula(
+
+-- TABLA DE MATRICULA
+CREATE TABLE IF NOT EXISTS Matricula(
     ID_MAT INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     DNIA VARCHAR(9) NOT NULL,
     IDCURSO VARCHAR(8) NOT NULL,
-    Estado_Matricula VARCHAR (40) NOT NULL,
+    Estado_Matricula VARCHAR(40) NOT NULL,
     FOREIGN KEY (DNIA) REFERENCES Alumno(DNI) 
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
     FOREIGN KEY (IDCURSO) REFERENCES Curso(ID_Curso)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 );
 
-
+-- INSERTS EN PROFESOR (actualiza si hay duplicado en DNI)
 INSERT INTO Profesor (DNI, Cargo, Nombre, Apellido, Telefono, fecha_alta, fecha_baja, Estado_Profesor) VALUES
 ('12345678A', 'Profesor', 'Luis', 'García Pérez', '600123456', '2020-09-01', NULL, 'ALTA'),
 ('23456789B', 'Profesor', 'Ana', 'López Díaz', '611234567', '2021-01-15', NULL, 'ALTA'),
@@ -77,8 +80,17 @@ INSERT INTO Profesor (DNI, Cargo, Nombre, Apellido, Telefono, fecha_alta, fecha_
 ('22234567V', 'Profesor', 'Beatriz', 'Corral Sáez', '622234567', '2010-04-10', NULL, 'ALTA'),
 ('23234567W', 'Profesor', 'Joaquín', 'Campos Ríos', '633345678', '2023-08-01', NULL, 'ALTA'),
 ('24234567X', 'Profesor', 'Patricia', 'Nieto Valdés', '644456789', '2016-12-01', NULL, 'ALTA'),
-('25234567Y', 'Profesor', 'Sergio', 'Pérez Lara', '655567890', '2021-07-20', NULL, 'ALTA');
+('25234567Y', 'Profesor', 'Sergio', 'Pérez Lara', '655567890', '2021-07-20', NULL, 'ALTA')
+ON DUPLICATE KEY UPDATE
+    Cargo = VALUES(Cargo),
+    Nombre = VALUES(Nombre),
+    Apellido = VALUES(Apellido),
+    Telefono = VALUES(Telefono),
+    fecha_alta = VALUES(fecha_alta),
+    fecha_baja = VALUES(fecha_baja),
+    Estado_Profesor = VALUES(Estado_Profesor);
 
+-- INSERTS EN ALUMNO (actualiza si hay duplicado en DNI)
 INSERT INTO Alumno (DNI, Cargo, Nombre, Apellido, Telefono, fecha_alta, fecha_baja, Estado_Alumno) VALUES
 ('11111111A', 'Estudiante', 'Valeria', 'Domínguez Alba', '600123100', '2022-09-01', NULL, 'ALTA'),
 ('22222222B', 'Estudiante', 'Mateo', 'Fuentes Bravo', '611234200', '2023-01-10', NULL, 'ALTA'),
@@ -105,14 +117,40 @@ INSERT INTO Alumno (DNI, Cargo, Nombre, Apellido, Telefono, fecha_alta, fecha_ba
 ('25252525W', 'Estudiante', 'Enzo', 'Lozano Barrios', '633345444', '2023-01-01', NULL, 'ALTA'),
 ('26262626X', 'Estudiante', 'Mía', 'Soler Manzano', '644456555', '2021-12-24', NULL, 'ALTA'),
 ('27272727Y', 'Estudiante', 'Álvaro', 'Marín Rosales', '655567666', '2020-09-10', NULL, 'ALTA'),
-('28282828Z', 'Estudiante', 'Julia', 'Saavedra Quintana', '666678888', '2023-06-06', NULL, 'ALTA');
+('28282828Z', 'Estudiante', 'Julia', 'Saavedra Quintana', '666678888', '2023-06-06', NULL, 'ALTA')
+ON DUPLICATE KEY UPDATE
+    Cargo = VALUES(Cargo),
+    Nombre = VALUES(Nombre),
+    Apellido = VALUES(Apellido),
+    Telefono = VALUES(Telefono),
+    fecha_alta = VALUES(fecha_alta),
+    fecha_baja = VALUES(fecha_baja),
+    Estado_Alumno = VALUES(Estado_Alumno);
 
+-- INSERTS EN CURSO
+INSERT INTO Curso (ID_Curso, Descripcion, Nombre_Curso, Estado_Curso, DNIP, fecha_inicio, fecha_fin) VALUES
+('IFCD0210','CURSO PARA DESEMPLEADOS, SUBCONVENCIONADO POR EL SEPE. "IFCD0210 DESARROLLO DE APLICACIONES CON TECNOLOGIAS WEB"','DESARROLLO DE APLICACIONES CON TECNOLOGIAS WEB','ALTA','12345678A','2025-01-28','2025-06-03')
+ON DUPLICATE KEY UPDATE
+    Descripcion = VALUES(Descripcion),
+    Nombre_Curso = VALUES(Nombre_Curso),
+    Estado_Curso = VALUES(Estado_Curso),
+    DNIP = VALUES(DNIP),
+    fecha_inicio = VALUES(fecha_inicio),
+    fecha_fin = VALUES(fecha_fin);
 
 INSERT INTO Curso (ID_Curso, Descripcion, Nombre_Curso, Estado_Curso, DNIP, fecha_inicio, fecha_fin) VALUES
-('IFCD0210','CURSO PARA DESEMPLEADOS, SUBCONVENCIONADO POR EL SEPE. "IFCD0210 DESARROLLO DE APLICACIONES CON TECNOLOGIAS WEB"','DESARROLLO DE APLICACIONES CON TECNOLOGIAS WEB','ALTA','12345678A','2025-01-28','2025-06-03');
-INSERT INTO Curso (ID_Curso, Descripcion, Nombre_Curso, Estado_Curso, DNIP, fecha_inicio, fecha_fin) VALUES
-('IFCD0220','CURSO PARA DESEMPLEADOS, SUBCONVENCIONADO POR EL SEPE. "IFCD0220 SISTEMA DE GESTIÓN DE INFORMACIÓN"','SISTEMA DE GESTIÓN DE INFORMACIÓN','ALTA','12345678A','2025-01-28','2025-06-03');
-INSERT INTO MATRICULA(DNIA, IDCURSO, Estado_Matricula) VALUES
+('IFCD0220','CURSO PARA DESEMPLEADOS, SUBCONVENCIONADO POR EL SEPE. "IFCD0220 SISTEMA DE GESTIÓN DE INFORMACIÓN"','SISTEMA DE GESTIÓN DE INFORMACIÓN','ALTA','12345678A','2025-01-28','2025-06-03')
+ON DUPLICATE KEY UPDATE
+    Descripcion = VALUES(Descripcion),
+    Nombre_Curso = VALUES(Nombre_Curso),
+    Estado_Curso = VALUES(Estado_Curso),
+    DNIP = VALUES(DNIP),
+    fecha_inicio = VALUES(fecha_inicio),
+    fecha_fin = VALUES(fecha_fin);
+
+
+-- INSERTS EN MATRICULA
+INSERT INTO Matricula(DNIA, IDCURSO, Estado_Matricula) VALUES
 ('28282828Z', 'IFCD0220' ,'ALTA'),
 ('27272727Y', 'IFCD0220' ,'ALTA'),
 ('26262626X', 'IFCD0220' ,'ALTA'),
@@ -124,9 +162,5 @@ INSERT INTO MATRICULA(DNIA, IDCURSO, Estado_Matricula) VALUES
 ('19191919R', 'IFCD0210' ,'ALTA');
 
 
-SELECT NOMBRE, APELLIDO, TELEFONO FROM ALUMNO;
-SELECT NOMBRE, APELLIDO, TELEFONO FROM PROFESOR;
-SELECT * FROM PROFESOR WHERE 
+-- (Aquí va todo tu script de creación de tablas e inserciones)
 
-SELECT * FROM CURSO;
-select * from matricula where IDCURSO="IFCD0220";
