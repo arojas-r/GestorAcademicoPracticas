@@ -147,7 +147,7 @@
     <div id="modalOverlay" class="modal-overlay">
         <div class="modal-content">
             <span class="close-button" onclick="hideForm()">&times;</span>
-            <h2 id="formTitle">Añadir/Modificar Profesor</h2>
+            <h2 id="formTitle">Gestionar profesorado</h2>
             <form id="profesorForm" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
                 <input type="hidden" id="is_edit" name="is_edit" value="">
 
@@ -161,7 +161,7 @@
                 <input type="text" id="Apellido" name="Apellido" required>
                 
                 <label for="Teléfono">Teléfono:</label>
-                <input type="text" id="Teléfono" name="Teléfono" required>
+                <input type="text " id="Teléfono" name="Teléfono" required>
 
                 <label for="Fecha_Alta">Fecha de Alta:</label>
                 <input type="date" id="Fecha_Alta" name="Fecha_Alta" required>
