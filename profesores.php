@@ -7,6 +7,16 @@
     <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
+    <header>
+        <div class="logo"><a href="index.php">📚 Instituto</a></div>
+        <nav>
+            <a href="alumnos.php">Alumnos</a>
+            <a href="profesores.php">Profesores</a>
+            <a href="cursos.php">Cursos</a>
+            <a href="matriculas.php">Matrículas</a>
+            <a href="consultas.php">Consultar</a>
+        </nav>
+    </header>
     <h1>Gestión de Profesores</h1>
 
     <?php
@@ -226,5 +236,10 @@
             }
         });
     </script>
+    <footer>
+    &copy; <?php echo date("Y"); ?> Instituto de Educación Superior. Todos los derechos reservados.
+    </footer>
 </body>
+
+
 </html>
