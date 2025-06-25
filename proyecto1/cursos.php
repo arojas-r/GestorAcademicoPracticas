@@ -36,6 +36,7 @@ $cursos = $conexion->query($query);
 
 <head>
     <title>Gestión de Cursos</title>
+    <link rel="stylesheet" href="css/estilos.css">
     <style>
         table,
         th,

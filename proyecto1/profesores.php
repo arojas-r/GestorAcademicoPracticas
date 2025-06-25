@@ -32,6 +32,7 @@ $resultado = $conexion->query($query);
 
 <head>
     <title>Gestión de Profesores</title>
+    <link rel="stylesheet" href="css/estilos.css">
     <style>
         table,
         th,

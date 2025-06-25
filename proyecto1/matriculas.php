@@ -36,6 +36,7 @@ $matriculas = $conexion->query("SELECT * FROM Matriculas WHERE DNI_Alumno LIKE '
 
 <head>
     <title>Gestión de Matrículas</title>
+    <link rel="stylesheet" href="css/estilos.css">
     <style>
         table,
         th,

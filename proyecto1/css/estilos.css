@@ -25,7 +25,7 @@ header {
     justify-content: space-between;
     align-items: center;
     height: 11vh;
-    padding: 5px 20px;
+    padding: 5px 40px;
     z-index: 99;
 }
 
@@ -93,10 +93,10 @@ MIGAS DE PAN
     gap: 10px;
     height: 5vh;
     padding: 5px 60px;
-    box-shadow: 0px 1px 1px 2px var(--background);
+    box-shadow: 0px 1px 5px var(--background);
 }
 
-.breadcrumbs a{
+.breadcrumbs a {
     text-decoration: none;
     font-weight: 600;
     color: var(--background);
@@ -104,6 +104,18 @@ MIGAS DE PAN
     transition: all .3s ease-in-out;
 }
 
-.breadcrumbs a:hover{
+.breadcrumbs a:hover {
     border-bottom: 3px solid var(--fontW);
+    color: var(--fontW);
+}
+
+/*
+HASTA AQUI MIGAS DE PAN
+-------------------------------------------------------
+-------------------------------------------------------
+CONFIG MAIN
+*/
+
+.container{
+    padding: 30px;
 }

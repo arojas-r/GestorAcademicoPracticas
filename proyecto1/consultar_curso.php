@@ -37,6 +37,7 @@ if (isset($_GET['buscar'])) {
 
 <head>
     <title>Consultar Curso</title>
+    <link rel="stylesheet" href="css/estilos.css">
     <style>
         table,
         th,
