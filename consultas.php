@@ -93,6 +93,8 @@ if (!empty($_GET['buscar'])) {
 
  <footer><?php require "footer.php"; ?></footer>
 
+     <a class="btnUP" href="#nav"><img src="img/up.png" alt="haz click para ir a inicio de página"></a>
+    
 </body>
 
 </html>
