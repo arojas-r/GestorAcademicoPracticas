@@ -1,29 +1,29 @@
 <?php include 'conexion.php';
 
-// Añadir profesor
+// Añadir alumno
 if (isset($_POST['add'])) {
-    $stmt = $conexion->prepare("INSERT INTO Profesores (DNI_Profesor, Nombre_Profesor, Apellido_Profesor, Telefono_Profesor, Estado_Profesor, Fecha_Alta_Profesor) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt = $conexion->prepare("INSERT INTO Alumnos (DNI_Alumno, Nombre_Alumno, Apellido_Alumno, Teléfono_Alumno, Estado_Alumno, Fecha_Alta_Alumno) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("ssssss", $_POST['dni'], $_POST['nombre'], $_POST['apellido'], $_POST['telefono'], $_POST['estado'], $_POST['fecha_alta']);
     $stmt->execute();
 }
 
-// Actualizar profesor
+// Actualizar alumno
 if (isset($_POST['update'])) {
-    $stmt = $conexion->prepare("UPDATE Profesores SET Nombre_Profesor=?, Apellido_Profesor=?, Telefono_Profesor=?, Estado_Profesor=?, Fecha_Alta_Profesor=?, Fecha_Baja_Profesor=? WHERE DNI_Profesor=?");
+    $stmt = $conexion->prepare("UPDATE Alumnos SET Nombre_Alumno=?, Apellido_Alumno=?, Teléfono_Alumno=?, Estado_Alumno=?, Fecha_Alta_Alumno=?, Fecha_Baja_Alumno=? WHERE DNI_Alumno=?");
     $stmt->bind_param("sssssss", $_POST['nombre'], $_POST['apellido'], $_POST['telefono'], $_POST['estado'], $_POST['fecha_alta'], $_POST['fecha_baja'], $_POST['dni']);
     $stmt->execute();
 }
 
-// Eliminar profesor
+// Eliminar alumno
 if (isset($_POST['delete'])) {
-    $stmt = $conexion->prepare("DELETE FROM Profesores WHERE DNI_Profesor=?");
+    $stmt = $conexion->prepare("DELETE FROM Alumnos WHERE DNI_Alumno=?");
     $stmt->bind_param("s", $_POST['dni']);
     $stmt->execute();
 }
 
 // Buscar
 $busqueda = isset($_GET['buscar']) ? $_GET['buscar'] : '';
-$query = "SELECT * FROM Profesores WHERE DNI_Profesor LIKE '%$busqueda%'";
+$query = "SELECT * FROM Alumnos WHERE DNI_Alumno LIKE '%$busqueda%'";
 $resultado = $conexion->query($query);
 ?>
 
@@ -31,7 +31,7 @@ $resultado = $conexion->query($query);
 <html>
 
 <head>
-    <title>Gestión de Profesores</title>
+    <title>Gestión de Alumnos</title>
     <link rel="stylesheet" href="css/estilos.css">
     <style>
         table,
@@ -54,10 +54,10 @@ $resultado = $conexion->query($query);
     </header>
 
     <div class="breadcrumbs">
-        <a href="index.php">Inicio</a> &raquo; <span>Gestión del profesorado.</span>
+        <a href="index.php">Inicio</a> &raquo; <span>Gestión del alumnado.</span>
     </div>
 
-    <h2>Gestión de Profesores</h2>
+    <h2>Gestión de Alumnos</h2>
 
     <!-- Buscar por DNI -->
     <form method="get">
@@ -65,8 +65,8 @@ $resultado = $conexion->query($query);
         <button type="submit">Buscar</button>
     </form>
 
-    <!-- Formulario para añadir profesor -->
-    <h3>Añadir Profesor</h3>
+    <!-- Formulario para añadir alumno -->
+    <h3>Añadir Alumno</h3>
     <form method="post">
         <input type="hidden" name="add" value="1">
         DNI: <input type="text" name="dni" required>
@@ -94,24 +94,24 @@ $resultado = $conexion->query($query);
             <th>Fecha Baja</th>
             <th>Acciones</th>
         </tr>
-        <?php while ($profesor = $resultado->fetch_assoc()): ?>
+        <?php while ($alumno = $resultado->fetch_assoc()): ?>
             <tr>
                 <form method="post">
-                    <td><input type="text" name="dni" value="<?= $profesor['DNI_Profesor'] ?>" readonly></td>
-                    <td><input type="text" name="nombre" value="<?= $profesor['Nombre_Profesor'] ?>"></td>
-                    <td><input type="text" name="apellido" value="<?= $profesor['Apellido_Profesor'] ?>"></td>
-                    <td><input type="text" name="telefono" value="<?= $profesor['Telefono_Profesor'] ?>"></td>
+                    <td><input type="text" name="dni" value="<?= $alumno['DNI_Alumno'] ?>" readonly></td>
+                    <td><input type="text" name="nombre" value="<?= $alumno['Nombre_Alumno'] ?>"></td>
+                    <td><input type="text" name="apellido" value="<?= $alumno['Apellido_Alumno'] ?>"></td>
+                    <td><input type="text" name="telefono" value="<?= $alumno['Teléfono_Alumno'] ?>"></td>
                     <td>
                         <select name="estado">
-                            <option value="activo" <?= $profesor['Estado_Profesor'] == 'activo' ? 'selected' : '' ?>>Activo</option>
-                            <option value="baja" <?= $profesor['Estado_Profesor'] == 'baja' ? 'selected' : '' ?>>Baja</option>
+                            <option value="activo" <?= $alumno['Estado_Alumno'] == 'activo' ? 'selected' : '' ?>>Activo</option>
+                            <option value="baja" <?= $alumno['Estado_Alumno'] == 'baja' ? 'selected' : '' ?>>Baja</option>
                         </select>
                     </td>
-                    <td><input type="date" name="fecha_alta" value="<?= $profesor['Fecha_Alta_Profesor'] ?>"></td>
-                    <td><input type="date" name="fecha_baja" value="<?= $profesor['Fecha_Baja_Profesor'] ?>"></td>
+                    <td><input type="date" name="fecha_alta" value="<?= $alumno['Fecha_Alta_Alumno'] ?>"></td>
+                    <td><input type="date" name="fecha_baja" value="<?= $alumno['Fecha_Baja_Alumno'] ?>"></td>
                     <td>
                         <button type="submit" name="update">Modificar</button>
-                        <button type="submit" name="delete" onclick="return confirm('¿Eliminar este profesor?')">Eliminar</button>
+                        <button type="submit" name="delete" onclick="return confirm('¿Seguro que quieres eliminar este alumno?')">Eliminar</button>
                     </td>
                 </form>
             </tr>
@@ -121,6 +121,7 @@ $resultado = $conexion->query($query);
     <footer>
         <?php require 'footer.php'; ?>
     </footer>
+
 
 </body>
 

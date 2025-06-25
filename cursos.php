@@ -1,234 +1,147 @@
+<?php include 'conexion.php';
+
+// Obtener profesores para el formulario desplegable
+$profesores = $conexion->query("SELECT DNI_Profesor, CONCAT(Nombre_Profesor, ' ', Apellido_Profesor) AS NombreCompleto FROM Profesores");
+
+// Añadir curso
+if (isset($_POST['add'])) {
+    $stmt = $conexion->prepare("INSERT INTO CURSOS (Nombre_Curso, Descripcion_Curso, DNI_PROFESOR, NOMBRE_PROFESOR, ESTADO_CURSO, FECHA_INICIO_CURSO, FECHA_FINAL_CURSO)
+                                 VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssssss", $_POST['nombre'], $_POST['descripcion'], $_POST['dni_prof'], $_POST['nombre_prof'], $_POST['estado'], $_POST['fecha_inicio'], $_POST['fecha_final']);
+    $stmt->execute();
+}
+
+// Actualizar curso
+if (isset($_POST['update'])) {
+    $stmt = $conexion->prepare("UPDATE CURSOS SET Nombre_Curso=?, Descripcion_Curso=?, DNI_PROFESOR=?, NOMBRE_PROFESOR=?, ESTADO_CURSO=?, FECHA_INICIO_CURSO=?, FECHA_FINAL_CURSO=? WHERE ID_CURSO=?");
+    $stmt->bind_param("sssssssi", $_POST['nombre'], $_POST['descripcion'], $_POST['dni_prof'], $_POST['nombre_prof'], $_POST['estado'], $_POST['fecha_inicio'], $_POST['fecha_final'], $_POST['id_curso']);
+    $stmt->execute();
+}
+
+// Eliminar curso
+if (isset($_POST['delete'])) {
+    $stmt = $conexion->prepare("DELETE FROM CURSOS WHERE ID_CURSO=?");
+    $stmt->bind_param("i", $_POST['id_curso']);
+    $stmt->execute();
+}
+
+// Buscar
+$busqueda = isset($_GET['buscar']) ? $_GET['buscar'] : '';
+$query = "SELECT * FROM CURSOS WHERE Nombre_Curso LIKE '%$busqueda%'";
+$cursos = $conexion->query($query);
+?>
+
 <!DOCTYPE html>
-<html lang="es">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Cursos</title>
     <link rel="stylesheet" href="css/estilos.css">
-
-</head>
-<body>
-
-    <?php require "header.php" ?>
-    <div class="breadcrumbs">
-        <a href="index.php">Inicio</a> &raquo; <span>Cursos</span>
-    </div>
-
-    <main>
-    <h1>CURSOS</h1>
-    <h2>Tabla de contenidos. Grupos Colon IECM</h2>
-
-    <?php
-    // Simulación de una base de datos con un array
-    session_start();
-
-    if (!isset($_SESSION['cursos'])) {
-        $_SESSION['cursos'] = [
-            [
-                'ID_Curso' => 1,
-                'Nombre' => 'Desarrollo Web Full Stack',
-                'Profesor_asignado' => 'Juan Pérez',
-                'Fecha_inicio' => '2025-09-01',
-                'Estado_del_curso' => 'Alta',
-                'Fecha_final' => '2026-03-01'
-            ],
-            [
-                'ID_Curso' => 2,
-                'Nombre' => 'Introducción a la Ciencia de Datos',
-                'Profesor_asignado' => 'María García',
-                'Fecha_inicio' => '2025-10-15',
-                'Estado_del_curso' => 'Alta',
-                'Fecha_final' => '2026-02-15'
-            ],
-            [
-                'ID_Curso' => 3,
-                'Nombre' => 'Diseño Gráfico Avanzado',
-                'Profesor_asignado' => 'Carlos Ruíz',
-                'Fecha_inicio' => '2025-08-01',
-                'Estado_del_curso' => 'Baja',
-                'Fecha_final' => '2024-12-01'
-            ]
-        ];
-        $_SESSION['next_id'] = 4;
-    }
-
-    // Lógica para eliminar un curso
-    if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id'])) {
-        $id_to_delete = (int)$_GET['id'];
-        $_SESSION['cursos'] = array_filter($_SESSION['cursos'], function($curso) use ($id_to_delete) {
-            return $curso['ID_Curso'] !== $id_to_delete;
-        });
-        $_SESSION['cursos'] = array_values($_SESSION['cursos']);
-        header('Location: cursos.php');
-        exit();
-    }
-
-    // Lógica para añadir o modificar un curso
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        $id = isset($_POST['id_curso']) ? (int)$_POST['id_curso'] : 0;
-        $nombre = htmlspecialchars($_POST['nombre']);
-        $profesor = htmlspecialchars($_POST['profesor_asignado']);
-        $fecha_inicio = htmlspecialchars($_POST['fecha_inicio']);
-        // Validar que el estado del curso sea 'Alta' o 'Baja'
-        $estado = in_array($_POST['estado_del_curso'], ['Alta', 'Baja']) ? htmlspecialchars($_POST['estado_del_curso']) : 'Alta';
-        $fecha_final = htmlspecialchars($_POST['fecha_final']);
-
-        if ($id > 0) {
-            // Modificar curso existente
-            foreach ($_SESSION['cursos'] as &$curso) {
-                if ($curso['ID_Curso'] === $id) {
-                    $curso['Nombre'] = $nombre;
-                    $curso['Profesor_asignado'] = $profesor;
-                    $curso['Fecha_inicio'] = $fecha_inicio;
-                    $curso['Estado_del_curso'] = $estado;
-                    $curso['Fecha_final'] = $fecha_final;
-                    break;
-                }
-            }
-        } else {
-            // Añadir nuevo curso
-            $new_id = $_SESSION['next_id']++;
-            $_SESSION['cursos'][] = [
-                'ID_Curso' => $new_id,
-                'Nombre' => $nombre,
-                'Profesor_asignado' => $profesor,
-                'Fecha_inicio' => $fecha_inicio,
-                'Estado_del_curso' => $estado,
-                'Fecha_final' => $fecha_final
-            ];
+    <style>
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 8px;
         }
-        header('Location: cursos.php');
-        exit();
-    }
 
-    $cursos_filtrados = $_SESSION['cursos'];
+        form {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
 
-    // Lógica para buscar cursos
-    if (isset($_GET['search_id']) && !empty($_GET['search_id'])) {
-        $search_id = (int)$_GET['search_id'];
-        $cursos_filtrados = array_filter($_SESSION['cursos'], function($curso) use ($search_id) {
-            return $curso['ID_Curso'] === $search_id;
-        });
-    }
-    ?>
+<body>
+    <header>
+        <?php require 'header.php'; ?>
+    </header>
 
-    <div class="search-container">
-        <form action="cursos.php" method="GET" style="display: flex; width: 100%;">
-            <input type="text" name="search_id" placeholder="Buscar curso por ID..." value="<?php echo isset($_GET['search_id']) ? htmlspecialchars($_GET['search_id']) : ''; ?>">
-            <button type="submit">Buscar</button>
-        </form>
+    <div class="breadcrumbs">
+        <a href="index.php">Inicio</a> &raquo; <span>Gestión de los cursos.</span>
     </div>
 
+    <h2>Gestión de Cursos</h2>
+
+    <!-- Buscar por nombre -->
+    <form method="get">
+        <input type="text" name="buscar" placeholder="Buscar por nombre del curso" value="<?= htmlspecialchars($busqueda) ?>">
+        <button type="submit">Buscar</button>
+    </form>
+
+    <!-- Añadir curso -->
+    <h3>Añadir Curso</h3>
+    <form method="post">
+        <input type="hidden" name="add" value="1">
+        Nombre: <input type="text" name="nombre" required>
+        Descripción: <input type="text" name="descripcion">
+        Profesor:
+        <select name="dni_prof" onchange="this.form.nombre_prof.value=this.options[this.selectedIndex].text">
+            <?php while ($prof = $profesores->fetch_assoc()): ?>
+                <option value="<?= $prof['DNI_Profesor'] ?>"><?= $prof['NombreCompleto'] ?></option>
+            <?php endwhile; ?>
+        </select>
+        <input type="hidden" name="nombre_prof" value="">
+        Estado:
+        <select name="estado">
+            <option value="Activo">Activo</option>
+            <option value="Cerrado">Cerrado</option>
+        </select>
+        Fecha Inicio: <input type="date" name="fecha_inicio" required>
+        Fecha Final: <input type="date" name="fecha_final">
+        <button type="submit">Añadir</button>
+    </form>
+
+    <!-- Tabla de cursos -->
     <table>
-        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>DNI Profesor</th>
+            <th>Nombre Profesor</th>
+            <th>Estado</th>
+            <th>Inicio</th>
+            <th>Final</th>
+            <th>Acciones</th>
+        </tr>
+        <?php while ($curso = $cursos->fetch_assoc()): ?>
             <tr>
-                <th>ID_Curso</th>
-                <th>Nombre</th>
-                <th>Profesor asignado</th>
-                <th>Fecha de inicio</th>
-                <th>Estado del curso</th>
-                <th>Fecha final</th>
-                <th>Acciones</th>
+                <form method="post">
+                    <td><?= $curso['ID_CURSO'] ?><input type="hidden" name="id_curso" value="<?= $curso['ID_CURSO'] ?>"></td>
+                    <td><input type="text" name="nombre" value="<?= $curso['Nombre_Curso'] ?>"></td>
+                    <td><input type="text" name="descripcion" value="<?= $curso['Descripcion_Curso'] ?>"></td>
+                    <td><input type="text" name="dni_prof" value="<?= $curso['DNI_PROFESOR'] ?>"></td>
+                    <td><input type="text" name="nombre_prof" value="<?= $curso['NOMBRE_PROFESOR'] ?>"></td>
+                    <td>
+                        <select name="estado">
+                            <option value="Activo" <?= $curso['ESTADO_CURSO'] == 'Activo' ? 'selected' : '' ?>>Activo</option>
+                            <option value="Cerrado" <?= $curso['ESTADO_CURSO'] == 'Cerrado' ? 'selected' : '' ?>>Cerrado</option>
+                        </select>
+                    </td>
+                    <td><input type="date" name="fecha_inicio" value="<?= $curso['FECHA_INICIO_CURSO'] ?>"></td>
+                    <td><input type="date" name="fecha_final" value="<?= $curso['FECHA_FINAL_CURSO'] ?>"></td>
+                    <td>
+                        <button type="submit" name="update">Modificar</button>
+                        <button type="submit" name="delete" onclick="return confirm('¿Eliminar este curso?')">Eliminar</button>
+                    </td>
+                </form>
             </tr>
-        </thead>
-        <tbody>
-            <?php if (empty($cursos_filtrados)): ?>
-                <tr>
-                    <td colspan="7">No se encontraron cursos.</td>
-                </tr>
-            <?php else: ?>
-                <?php foreach ($cursos_filtrados as $curso): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($curso['ID_Curso']); ?></td>
-                        <td><?php echo htmlspecialchars($curso['Nombre']); ?></td>
-                        <td><?php echo htmlspecialchars($curso['Profesor_asignado']); ?></td>
-                        <td><?php echo htmlspecialchars($curso['Fecha_inicio']); ?></td>
-                        <td><?php echo htmlspecialchars($curso['Estado_del_curso']); ?></td>
-                        <td><?php echo htmlspecialchars($curso['Fecha_final']); ?></td>
-                        <td class="actions">
-                            <button class="btn btn-delete" onclick="if(confirm('¿Estás seguro de eliminar este curso?')) { window.location.href='cursos.php?action=delete&id=<?php echo $curso['ID_Curso']; ?>'; }">Eliminar datos</button>
-                            <button class="btn btn-modify" onclick="showForm(<?php echo htmlspecialchars(json_encode($curso)); ?>)">Modificar datos</button>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </tbody>
+        <?php endwhile; ?>
     </table>
 
-    <button class="btn btn-add" onclick="showForm()">Añadir Curso</button>
-
-    <div id="modalOverlay" class="modal-overlay">
-        <div class="modal-content">
-            <span class="close-button" onclick="hideForm()">&times;</span>
-            <h2>Gestionar curso</h2>
-            <form id="courseForm" action="cursos.php" method="POST">
-                <input type="hidden" id="id_curso" name="id_curso" value="">
-
-                <label for="nombre">Nombre:</label>
-                <input type="text" id="nombre" name="nombre" required>
-
-                <label for="profesor_asignado">Profesor asignado:</label>
-                <input type="text" id="profesor_asignado" name="profesor_asignado" required>
-
-                <label for="fecha_inicio">Fecha de inicio:</label>
-                <input type="date" id="fecha_inicio" name="fecha_inicio" required>
-
-                <label for="estado_del_curso">Estado del curso:</label>
-                <select id="estado_del_curso" name="estado_del_curso" required>
-                    <option value="Alta">Alta</option>
-                    <option value="Baja">Baja</option>
-                </select>
-
-                <label for="fecha_final">Fecha final:</label>
-                <input type="date" id="fecha_final" name="fecha_final" required>
-
-                <button type="submit" id="submitButton">Guardar</button>
-                <button type="button" class="btn btn-cancel" onclick="hideForm()">Cancelar</button>
-            </form>
-        </div>
-    </div>
-
-    </main>
-
-    <?php require "footer.php" ?>
-
     <script>
-        function showForm(curso = null) {
-            const modalOverlay = document.getElementById('modalOverlay');
-            const form = document.getElementById('courseForm');
-            const submitButton = document.getElementById('submitButton');
-
-            modalOverlay.style.display = 'flex'; // Muestra el modal
-
-            if (curso) {
-                // Rellenar formulario para modificar
-                document.getElementById('id_curso').value = curso.ID_Curso;
-                document.getElementById('nombre').value = curso.Nombre;
-                document.getElementById('profesor_asignado').value = curso.Profesor_asignado;
-                document.getElementById('fecha_inicio').value = curso.Fecha_inicio;
-                document.getElementById('estado_del_curso').value = curso.Estado_del_curso;
-                document.getElementById('fecha_final').value = curso.Fecha_final;
-                submitButton.textContent = 'Modificar';
-            } else {
-                // Limpiar formulario para añadir
-                form.reset();
-                document.getElementById('id_curso').value = '';
-                submitButton.textContent = 'Añadir';
-                document.getElementById('estado_del_curso').value = 'Alta'; // Valor por defecto
-            }
-        }
-
-        function hideForm() {
-            const modalOverlay = document.getElementById('modalOverlay');
-            modalOverlay.style.display = 'none'; // Oculta el modal
-        }
-
-        // Cerrar el modal al hacer clic fuera del contenido
-        document.getElementById('modalOverlay').addEventListener('click', function(event) {
-            if (event.target === this) {
-                hideForm();
-            }
+        // autocompletar nombre profesor al seleccionar
+        document.querySelector('select[name="dni_prof"]').addEventListener('change', function() {
+            document.querySelector('input[name="nombre_prof"]').value = this.options[this.selectedIndex].text;
         });
     </script>
+
+    <footer>
+        <?php require 'footer.php'; ?>
+    </footer>
+
+
 </body>
-</html> 
+
+</html>
