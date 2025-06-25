@@ -1,7 +1,7 @@
 <!DOCTYPE html>
     <header>
         <div class="logo"><a href="index.php">📚 Instituto</a></div>
-        <nav>
+        <nav id="nav">
             <a href="alumnos.php">Alumnos</a>
             <a href="profesores.php">Profesores</a>
             <a href="cursos.php">Cursos</a>
