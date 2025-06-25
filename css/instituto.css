@@ -15,7 +15,7 @@
 --------------CONDICIONES GENERALES
 */
 html{
-        scrollbar-width: none
+    scrollbar-width: none;
 }
 
 * {
@@ -42,6 +42,7 @@ header {
     align-items: center;
     padding: 0vh 3vw;
     height: 11vh;
+    z-index: 50;
 }
 
 .logo {
@@ -105,6 +106,7 @@ footer {
     font-size: 22px;
     color: var(--background);
     box-shadow: 0px 1px 5px var(--thtable);
+    z-index: 45;
 }
 
 .breadcrumbs a {
@@ -132,6 +134,22 @@ main h1 {
     font-size: 40px;
 }
 
+.backgroundIMG{
+    position: fixed;
+    width:100%;
+    z-index: -1;
+}
+
+.Titulo_index{
+    width: 50%;
+    padding: 4vh 5vw;
+    border-radius:5px;
+    color: var(--background);
+    text-shadow: 2px 1px black;
+    position: fixed;
+    top: 25vh;
+}
+
 
 
 /*
@@ -147,7 +165,7 @@ table {
     box-shadow: 0px 0px 5px black;
 }
 
-.little{
+.little {
     margin-top: 1vh;
     width: 50%;
 }
@@ -237,11 +255,11 @@ tr:nth-child(even) {
     width: 70%;
 }
 
-.list{
+.list {
     font-size: 18px;
 }
 
-.resumen-curso{
+.resumen-curso {
     margin: 2vh 0vw;
     padding: 25px;
     width: 50%;
@@ -250,7 +268,7 @@ tr:nth-child(even) {
     justify-content: center;
     align-items: start;
     flex-direction: column;
-    gap:1vh;
+    gap: 1vh;
 }
 
 /* 
@@ -331,4 +349,26 @@ tr:nth-child(even) {
 
 .close-button:hover {
     color: #333;
+}
+
+/*
+---------------------BOTON UP
+*/
+
+.btnUP {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    bottom: 40px;
+    right: 40px;
+    background-color: var(--thtable);
+    border-radius: 999px;
+    box-shadow: 0px 0px 3px var(--modify);
+    cursor: pointer;
+    transition: all .5s ease;
+}
+
+.btnUP:hover {
+    background-color: var(--background);
 }
