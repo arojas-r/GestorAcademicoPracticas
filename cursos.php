@@ -204,6 +204,8 @@ $profesoresDisponibles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
  <footer><?php require "footer.php"; ?></footer>
 
+     <a class="btnUP" href="#nav"><img src="img/up.png" alt="haz click para ir a inicio de página"></a>
+
     <script>
         // Funciones existentes
         function editarCurso(id, nombre, descripcion, dnip, estado, inicio, fin) {
