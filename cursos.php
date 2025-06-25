@@ -114,7 +114,7 @@ $profesoresDisponibles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         <div class="search-container">
             <form method="get" class="global-actions">
-                <input type="text" name="search" placeholder="Buscar curso" value="<?= htmlspecialchars($search) ?>" style="flex: 1; margin-right: 10px;">
+                <input class="buscador-bar" type="text" name="search" placeholder="Buscar curso" value="<?= htmlspecialchars($search) ?>" style="flex: 1; margin-right: 10px;">
                 <button class="btn btn-search" type="submit">Buscar</button>
 
             </form>
