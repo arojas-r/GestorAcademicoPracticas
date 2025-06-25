@@ -12,23 +12,29 @@
     <div class="header-container">
         <h1 class="titulo-alumno">Área del Alumno</h1>
         <div class="btn-group">
-            <button  class="btn-toggle" onclick="toggleSection('formAlta')">Dame de Alta</button>
+            <button  class="btn-toggle" onclick="toggleSection('formAlta')">Dar de Alta</button>
             <button  class="btn-toggle" onclick="toggleSection('formGestion')">Gestionar Datos</button>
         </div>
     </div>
 
-    <p class="descripcion-alumno">Bienvenido al área del alumno. Aquí puedes gestionar tus datos y ver tu progreso.</p>
+    <p class="descripcion-alumno">"Bienvenido al área de alumnos. Aquí puedes gestionar los datos de los estudiantes y consultar su progreso."</p>
 
     <section id="formAlta" class="hidden toggle-section form-alta">
         <form action="" method="post">
+            <label for="DNI">DNI:</label>
+            <input type="text" id="DNI" name="DNI" pattern="[0-9][a-zA-Z]{7,8}" title="DNI debe tener entre 8 y 9 caracteres, comenzando con un número" required>
+
             <label for="Nombre">Nombre:</label>
             <input type="text" id="Nombre" name="Nombre" required>
 
             <label for="Apellido">Apellido:</label>
             <input type="text" id="Apellido" name="Apellido" required>
 
-            <label for="DNI">DNI:</label>
-            <input type="text" id="DNI" name="DNI" pattern="[0-9][a-zA-Z]{7,8}" title="DNI debe tener entre 8 y 9 caracteres, comenzando con un número" required>
+            <label for="Cargo">Cargo:</label>
+            <select id="Cargo" name="Cargo" required>
+                <option value="Alumno">Alumno</option>
+                <option value="Profesor">Profesor</option>
+            </select><br><br>
 
             <label for="fecha-inicio">Fecha de Inicio:</label>
             <input type="date" id="fecha-inicio" name="fecha-alta" required><br><br>
@@ -44,7 +50,7 @@
     </section>
 
     <section id="formGestion" class="hidden toggle-section form-gestion">
-        <p class="descripcion-gestion">Aquí puedes gestionar tus datos.</p>
+        <p class="descripcion-gestion">Aquí puedes gestionar los datos de los estudiantes.</p>
         
     <?php
     // Simulación de una base de datos con un array
