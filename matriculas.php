@@ -174,7 +174,7 @@ $alumnos = $pdo->query("SELECT DNI, CONCAT(Nombre, ' ', Apellido) AS NombreCompl
 </main>
 
 <footer><?php require "footer.php"; ?></footer>
-
+ <a class="btnUP" href="#nav"><img src="img/up.png" alt="haz click para ir a inicio de página"></a>
 <script>
     function confirmarEliminacion() {
         const seleccionados = Array.from(document.querySelectorAll('input[name="selectedMatriculas[]"]:checked')).map(cb => cb.value);
