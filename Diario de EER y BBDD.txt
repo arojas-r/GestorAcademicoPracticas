@@ -1,0 +1,44 @@
+En el marco de las prácticas, se llevó a cabo el diseño e implementación de un sistema relacional orientado a la gestión académica de un instituto educativo. El objetivo principal fue desarrollar una base de datos funcional que permitiera organizar y gestionar la información relacionada con profesores, alumnos y cursos, cumpliendo con los requisitos funcionales definidos previamente.
+
+Durante la creación del Esquema de Entidad Relacional surgieron varios cambios al darnos cuenta que, con las Llaves Primarias de algunos campos en Curso y en Alumno podríamos crear el cuadro de matricula el cual no habiamos tomado en consideración. 
+
+Al tener en cuenta esto, decidimos que debian ser 4 tablas donde "Alumno y Profesor" compartian los mismos datos entre si, lo cual podriamos distingirguilo como Persona. El unico campo que encontramos un poco distinto fue el campo de estado y se llegó a la conclusión de darle valores distinto con el fin de mas adelante darle valores distintos para"Estado_Profesor".
+
+Seguido a esto nos dispusimos a discutir con que paginas tenia comunicación Alumno que a pesar de que tenia que verse en Curso, debia pasar por un proceso de matriculacion, en el cual le creamos una tabla y lo distinguimos tomando varias Llaves Foraneas como lo fueron el DNI del  Alumno(DNIA) y el ID del Curso (ID_Curso). Esto con el fin de que en Matricula pudieran guardarse los datos de todos los alumnos y sus cursos.
+
+Hecho todo esto hicimos la conexión entre profesor y curso, tomando en consideracion las pautas dadas, ya que debe haber un Profesor Asignado en cada curso, la pagina de curso debía tener una conexion mediante FK a los datos de profesor. Así fué como se construyó Curso, Tomando en cuenta las conexiones que se tenian entre curso y profesor.
+
+Dicho todo esto, las cardinalidades de estas van de alumno a matricula de 1 a Varios(1,N) ya que puede haber un alumno por matricula el cual es un dato que se utilizara para ceder cupos en curso. En de matricula a alumno de 1 a 1 (1,1) ya que una matricula pertenece a un alumno.
+
+Las cardinales de matricula a curso van de 1 a 1(1,1) esto porque una matricula con su codigo unico va destinado a un codigo. De curso a matricula van de 1 a varios(1,n), esto porque en un curso pueden haber varias matriculas.
+
+las cardinalidades de profesor a curso van de uno a varios(1,n) esto porque un profesor puede impartir varios cursos. De cursos a profesor va de uno a uno (1,1) esto porque un curso puede ser impartido por un profesor.
+
+Ahora desglozando la entidad relacional nos encontramos con todos los campos descritos en las tablas de la base de datos donde DNI(de profesor) actua como Llave Primaria(PK) y a su vez como Llave Foreanea en la tabla Curso como DNIP(FK). Siguiendo esta lógica y orden en la siguiente tabla llamada Curso nos encontramos con que la Llave Primaria(PK) llamada ID_Cursos tambien es una foranea para la tabla de matriculas.
+
+Luego en la tabla de Alumno, el campo llamado DNI el cual es una llave primaria, tambien es una llave foranea para la siguiente tabla. 
+
+La tabla de matriculas es la que mas conexiones tiene ya que contempla dos foraneas antes mencionadas DNIA(La cual es DNI en la tabla de alumno) y IDCURSO(La cual es descrita como DNI_Curso en la tabla de Curso).
+
+Teniendo todo esto se logra realizar la base de datos y llevar un orden al momento de realizarlas.
+
+Creación de BBDD "Instituto"
+
+Una vez definido el Esquema de Entidad relacional, procedimos a la creación de la Base de Datos, que llevó por nombre "Instituto". 
+
+Atendiendo a las funcionalidades requeridas, la primera tabla, denominada Profesor, atendió a las dos solicitudes "Alta, baja modificación y listado de profesores", y "A cada profesor se le asignan uno o varios cursos" mediante la creación de la Clave Primaria (PK) "DNI VARCHAR(9) PRIMARY KEY NOT NULL". Esto, con el fin de crear una conexión como Clave Foránea con la tabla denominada "Cursos", mencionada antes en el ERE. 
+
+El resto de los campos, que permiten las funcionalidades, se denominaron como: Cargo, Nombre, Apellido, Telefono, fecha_alta, fecha_baja, y Estado_Profesor.
+
+Para la segunda tabla, llamada Alumno, se definió como PK: "DNI VARCHAR(9) PRIMARY KEY NOT NULL", para conectar como Clave Foránea con la tabla "Matricula", definida en el ERE. el resto de sus campos, son: Cargo, Nombre, Apellido, Telefono, fecha_alta, fecha_baja, y Estado_Alumno.
+
+Por su parte, la tercera tabla, Curso, tiene incluida como PK "ID_Curso VARCHAR(8) PRIMARY KEY NOT NULL", la cual, a su vez funciona como Clave Foránea para la tabla Matricula. Así pues, teniendo incluida la FK DNIP, esta tabla permite visualizar el profesor asignado para cada curso, así como otros datos incluidos en la tabla, tales como: Descripcion, Nombre_Curso, Estado_Curso, fecha_inicio y fecha_fin.
+
+Finalmente la cuarta tabla, Matricula, posee una PK llamada ID_MAT, con los valores INT AUTO_INCREMENT PRIMARY KEY NOT NULL. Su función es dar de alta, baja y mostrar los datos de los alumnos matriculados  mediante la PK, DNIA. El resto de sus campos, son: IDCURSO y Estado_Matricula.
+
+La Base de Datos fue desarrollada mediante el editor de código fuente "Visual Studio Code" y su extensión de MySQL, mismo medio utilizado durante la fase teórica de la certificación "Desarrollo de Aplicaciones con Tecnología Web".
+
+ 
+
+
+
