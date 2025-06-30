@@ -58,7 +58,7 @@ if (!empty($_GET['search_dni'])) {
 $matriculas = $stmt->fetchAll();
 
 $cursos = $pdo->query("SELECT ID_Curso, Nombre_Curso FROM Curso")->fetchAll();
-$alumnos = $pdo->query("SELECT DNI, CONCAT(Nombre, ' ', Apellido) AS NombreCompleto FROM Alumno WHERE Estado_Alumno = 'ALTA'")->fetchAll();
+$alumnos = $pdo->query("SELECT DNI, CONCAT(Nombre, ' ', Apellido) AS NombreCompleto FROM Alumno WHERE Estado_Alumno = 'ALTA' ORDER BY NombreCompleto ASC")->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -79,8 +79,15 @@ $alumnos = $pdo->query("SELECT DNI, CONCAT(Nombre, ' ', Apellido) AS NombreCompl
 <main>
     <h1>Gestión de Matrículas</h1>
 
+<?php if (!empty($mensaje)): ?>
+    <div class="alerta" style="color: red; font-weight: bold; margin: 10px 0;">
+        <?= htmlspecialchars($mensaje) ?>
+    </div>
+<?php endif; ?>
+
+
     <div class="search-container">
-        <form class="global-actions list" method="get">
+        <form class="global-actions list" method="get" >
             <label>Filtrar por alumno:</label>
             <select class="list" name="search_dni" onchange="this.form.submit()">
                 <option value="">-- Mostrar todos --</option>

@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eliminar_multiple']))
 
 // Añadir o modificar profesor
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['eliminar_multiple'])) {
-    $dni = $_POST['DNI'];
+    $dni = strtoupper($_POST['DNI']);
     $nombre = $_POST['Nombre'];
     $apellido = $_POST['Apellido'];
     $telefono = $_POST['Teléfono'];
@@ -177,7 +177,7 @@ $profesores = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <input type="hidden" id="is_edit" name="is_edit">
 
                     <label for="DNI">DNI:</label>
-                    <input type="text" id="DNI" name="DNI" required>
+                    <input type="text" id="DNI" name="DNI" required pattern="^[X-Z,x-z,0-9][0-9]{7}[A-Z]$" required>
 
                     <label for="Nombre">Nombre:</label>
                     <input type="text" id="Nombre" name="Nombre" required>
@@ -186,10 +186,10 @@ $profesores = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <input type="text" id="Apellido" name="Apellido" required>
 
                     <label for="Teléfono">Teléfono:</label>
-                    <input type="text" id="Teléfono" name="Teléfono" required>
+                    <input type="text" id="Teléfono" name="Teléfono" required pattern="[0-9]{9}" required>
 
                     <label for="Fecha_Alta">Fecha de Alta:</label>
-                    <input type="date" id="Fecha_Alta" name="Fecha_Alta" required>
+                    <input type="date" id="Fecha_Alta" name="Fecha_Alta" required min="2025-06-30">
 
                     <label for="Estado_Profesor">Estado:</label>
                     <select id="Estado_Profesor" name="Estado_Profesor" required>
@@ -198,7 +198,7 @@ $profesores = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </select>
 
                     <label for="Fecha_Baja">Fecha de Baja:</label>
-                    <input type="date" id="Fecha_Baja" name="Fecha_Baja">
+                    <input type="date" id="Fecha_Baja" name="Fecha_Baja" min="2025-06-30">
 
                     <button type="submit" id="submitButton">Guardar</button>
                     <button type="button" class="btn btn-cancel" onclick="hideForm()">Cancelar</button>
@@ -212,83 +212,104 @@ $profesores = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <a class="btnUP" href="#nav"><img src="img/up.png" alt="haz click para ir a inicio de página"></a>
 
-    <script>
-        function showForm(p = null) {
-            document.getElementById('modalOverlay').style.display = 'flex';
-            const form = document.getElementById('profesorForm');
-            form.reset();
-            document.getElementById('is_edit').value = '';
+    <!-- Dentro del mismo archivo que ya tienes, justo antes del cierre de </body> -->
 
-            if (p) {
-                document.getElementById('formTitle').textContent = 'Modificar Profesor';
-                document.getElementById('submitButton').textContent = 'Modificar';
-                document.getElementById('is_edit').value = p.dni;
-                document.getElementById('DNI').value = p.dni;
-                document.getElementById('DNI').readOnly = true;
-                document.getElementById('Nombre').value = p.nombre;
-                document.getElementById('Apellido').value = p.apellido;
-                document.getElementById('Teléfono').value = p.telefono;
-                document.getElementById('Fecha_Alta').value = p.fechaalta;
-                document.getElementById('Estado_Profesor').value = p.estado;
-                document.getElementById('Fecha_Baja').value = p.fechabaja;
+<script>
+    function showForm(p = null) {
+        document.getElementById('modalOverlay').style.display = 'flex';
+        const form = document.getElementById('profesorForm');
+        form.reset();
+        document.getElementById('is_edit').value = '';
+
+        if (p) {
+            document.getElementById('formTitle').textContent = 'Modificar Profesor';
+            document.getElementById('submitButton').textContent = 'Modificar';
+            document.getElementById('is_edit').value = p.dni;
+            document.getElementById('DNI').value = p.dni;
+            document.getElementById('DNI').readOnly = true;
+            document.getElementById('Nombre').value = p.nombre;
+            document.getElementById('Apellido').value = p.apellido;
+            document.getElementById('Teléfono').value = p.telefono;
+            document.getElementById('Fecha_Alta').value = p.fechaalta;
+            document.getElementById('Estado_Profesor').value = p.estado;
+            document.getElementById('Fecha_Baja').value = p.fechabaja;
+        } else {
+            document.getElementById('formTitle').textContent = 'Añadir Profesor';
+            document.getElementById('submitButton').textContent = 'Añadir';
+            document.getElementById('DNI').readOnly = false;
+        }
+
+        // Actualizar restricción de Fecha_Baja cuando se abre el formulario
+        actualizarRestriccionFechaBaja();
+    }
+
+    function hideForm() {
+        document.getElementById('modalOverlay').style.display = 'none';
+    }
+
+    document.getElementById('modalOverlay').addEventListener('click', function(e) {
+        if (e.target === this) hideForm();
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const btnModificar = document.getElementById('btnModificarGlobal');
+        const checkboxes = document.querySelectorAll('.profesor-checkbox');
+
+        btnModificar.addEventListener('click', function () {
+            const seleccionados = Array.from(checkboxes).filter(cb => cb.checked);
+            if (seleccionados.length !== 1) {
+                alert('Por favor, seleccione una única fila para modificar.');
+                return;
+            }
+
+            const cb = seleccionados[0];
+            showForm({
+                dni: cb.dataset.dni,
+                nombre: cb.dataset.nombre,
+                apellido: cb.dataset.apellido,
+                telefono: cb.dataset.telefono,
+                fechaalta: cb.dataset.fechaalta,
+                estado: cb.dataset.estado,
+                fechabaja: cb.dataset.fechabaja
+            });
+        });
+
+        const formEliminar = document.getElementById('formEliminarMultiple');
+        formEliminar.addEventListener('submit', function(e) {
+            const seleccionados = Array.from(checkboxes).filter(cb => cb.checked);
+            if (seleccionados.length === 0) {
+                alert('Por favor, seleccione al menos un profesor para eliminar.');
+                e.preventDefault();
+                return;
+            }
+
+            const confirmacion = confirm('¿Está seguro de que desea eliminar los profesores seleccionados?');
+            if (!confirmacion) {
+                e.preventDefault();
+                return;
+            }
+
+            const inputHidden = document.getElementById('seleccionados');
+            inputHidden.value = seleccionados.map(cb => cb.value);
+        });
+
+        // === VALIDACIÓN DE FECHAS ===
+        const fechaAltaInput = document.getElementById('Fecha_Alta');
+        const fechaBajaInput = document.getElementById('Fecha_Baja');
+
+        fechaAltaInput.addEventListener('change', actualizarRestriccionFechaBaja);
+
+        function actualizarRestriccionFechaBaja() {
+            const fechaAlta = fechaAltaInput.value;
+            if (fechaAlta) {
+                fechaBajaInput.min = fechaAlta;
             } else {
-                document.getElementById('formTitle').textContent = 'Añadir Profesor';
-                document.getElementById('submitButton').textContent = 'Añadir';
-                document.getElementById('DNI').readOnly = false;
+                fechaBajaInput.min = "2025-06-30";
             }
         }
+    });
+</script>
 
-        function hideForm() {
-            document.getElementById('modalOverlay').style.display = 'none';
-        }
-
-        document.getElementById('modalOverlay').addEventListener('click', function(e) {
-            if (e.target === this) hideForm();
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const btnModificar = document.getElementById('btnModificarGlobal');
-            const checkboxes = document.querySelectorAll('.profesor-checkbox');
-
-            btnModificar.addEventListener('click', function() {
-                const seleccionados = Array.from(checkboxes).filter(cb => cb.checked);
-                if (seleccionados.length !== 1) {
-                    alert('Por favor, seleccione una única fila para modificar.');
-                    return;
-                }
-
-                const cb = seleccionados[0];
-                showForm({
-                    dni: cb.dataset.dni,
-                    nombre: cb.dataset.nombre,
-                    apellido: cb.dataset.apellido,
-                    telefono: cb.dataset.telefono,
-                    fechaalta: cb.dataset.fechaalta,
-                    estado: cb.dataset.estado,
-                    fechabaja: cb.dataset.fechabaja
-                });
-            });
-
-            const formEliminar = document.getElementById('formEliminarMultiple');
-            formEliminar.addEventListener('submit', function(e) {
-                const seleccionados = Array.from(checkboxes).filter(cb => cb.checked);
-                if (seleccionados.length === 0) {
-                    alert('Por favor, seleccione al menos un profesor para eliminar.');
-                    e.preventDefault();
-                    return;
-                }
-
-                const confirmacion = confirm('¿Está seguro de que desea eliminar los profesores seleccionados?');
-                if (!confirmacion) {
-                    e.preventDefault();
-                    return;
-                }
-
-                const inputHidden = document.getElementById('seleccionados');
-                inputHidden.value = seleccionados.map(cb => cb.value);
-            });
-        });
-    </script>
 </body>
 
 </html>

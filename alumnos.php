@@ -29,7 +29,7 @@ if (isset($_GET['action'], $_GET['dnis']) && $_GET['action'] === 'delete_multipl
 
 // Añadir o modificar (sin cambios en esta sección)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $dni = $_POST['DNI'];
+    $dni = strtoupper($_POST['DNI']);
     $nombre = $_POST['Nombre'];
     $apellido = $_POST['Apellido'];
     $telefono = $_POST['Telefono'];
@@ -109,8 +109,6 @@ $alumnos = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </div>
 
-
-
         <table>
             <thead>
                 <tr>
@@ -162,105 +160,128 @@ $alumnos = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="modal-content">
                 <span class="close-button" onclick="ocultarFormulario()">&times;</span>
                 <h2 id="formTitle">Añadir Alumno</h2>
-                <form method="post">
+                <form method="post" id="formAlumno">
                     <input type="hidden" name="is_edit" id="is_edit">
-                    <label>DNI:<br><input type="text" name="DNI" id="DNI" required></label>
+                    <label>DNI:<br><input type="text" name="DNI" id="DNI" required pattern="^[X-Zx-z0-9][0-9]{7}[A-Z,a-z]$"></label>
                     <label>Nombre:<br><input type="text" name="Nombre" id="Nombre" required></label>
                     <label>Apellido:<br><input type="text" name="Apellido" id="Apellido" required></label>
-                    <label>Teléfono:<br><input type="text" name="Telefono" id="Telefono" required></label>
-                    <label>Fecha Alta:<br><input type="date" name="Fecha_Alta" id="Fecha_Alta" required></label>
+                    <label>Teléfono:<br><input type="tel" name="Telefono" id="Telefono" required pattern="[0-9]{9,15}"></label>
+                    <label>Fecha Alta:<br><input type="date" name="Fecha_Alta" id="Fecha_Alta" required min="2025-06-30"></label>
                     <label>Estado:<br>
                         <select name="Estado_Alumno" id="Estado_Alumno">
                             <option value="ALTA">ALTA</option>
                             <option value="BAJA">BAJA</option>
                         </select>
                     </label>
-                    <label>Fecha Baja:<br><input type="date" name="Fecha_Baja" id="Fecha_Baja"></label>
+                    <label>Fecha Baja:<br><input type="date" name="Fecha_Baja" id="Fecha_Baja" min="2025-06-30"></label>
                     <button type="submit">Guardar</button>
                     <button type="button" class="btn btn-cancel" onclick="ocultarFormulario()">Cancelar</button>
                 </form>
             </div>
         </div>
-
     </main>
 
  <footer><?php require "footer.php"; ?></footer>
 
  <a class="btnUP" href="#nav"><img src="img/up.png" alt="haz click para ir a inicio de página"></a>
 
-    <script>
-        // Funciones existentes (no se modifican)
-        function mostrarFormulario() {
-            document.getElementById('modalOverlay').style.display = 'flex';
-            document.getElementById('formTitle').textContent = 'Añadir Alumno';
-            document.getElementById('is_edit').value = '';
-            document.getElementById('DNI').readOnly = false;
-            document.querySelector('form').reset();
-        }
+<script>
+    // Funciones existentes
+    function mostrarFormulario() {
+        document.getElementById('modalOverlay').style.display = 'flex';
+        document.getElementById('formTitle').textContent = 'Añadir Alumno';
+        document.getElementById('is_edit').value = '';
+        document.getElementById('DNI').readOnly = false;
+        document.querySelector('form').reset();
+    }
 
-        function editarAlumno(dni, nombre, apellido, telefono, fechaAlta, estado, fechaBaja) {
-            mostrarFormulario(); // Reutilizamos para mostrar y limpiar
-            document.getElementById('formTitle').textContent = 'Modificar Alumno';
-            document.getElementById('is_edit').value = dni; // Marcamos que es edición
-            document.getElementById('DNI').value = dni;
-            document.getElementById('DNI').readOnly = true; // El DNI no se puede cambiar al editar
-            document.getElementById('Nombre').value = nombre;
-            document.getElementById('Apellido').value = apellido;
-            document.getElementById('Telefono').value = telefono;
-            document.getElementById('Fecha_Alta').value = fechaAlta;
-            document.getElementById('Estado_Alumno').value = estado;
-            document.getElementById('Fecha_Baja').value = fechaBaja;
-        }
+    function editarAlumno(dni, nombre, apellido, telefono, fechaAlta, estado, fechaBaja) {
+        mostrarFormulario();
+        document.getElementById('formTitle').textContent = 'Modificar Alumno';
+        document.getElementById('is_edit').value = dni;
+        document.getElementById('DNI').value = dni;
+        document.getElementById('DNI').readOnly = true;
+        document.getElementById('Nombre').value = nombre;
+        document.getElementById('Apellido').value = apellido;
+        document.getElementById('Telefono').value = telefono;
+        document.getElementById('Fecha_Alta').value = fechaAlta;
+        document.getElementById('Estado_Alumno').value = estado;
+        document.getElementById('Fecha_Baja').value = fechaBaja;
+    }
 
-        function ocultarFormulario() {
-            document.getElementById('modalOverlay').style.display = 'none';
-        }
+    function ocultarFormulario() {
+        document.getElementById('modalOverlay').style.display = 'none';
+    }
 
-        // NUEVO: Lógica para los botones globales
-        document.addEventListener('DOMContentLoaded', function() {
-            const btnModificar = document.getElementById('btnModificarGlobal');
-            const btnEliminar = document.getElementById('btnEliminarGlobal');
+    // Validación y lógica global
+    document.addEventListener('DOMContentLoaded', function() {
+        const btnModificar = document.getElementById('btnModificarGlobal');
+        const btnEliminar = document.getElementById('btnEliminarGlobal');
+        const formAlumno = document.getElementById('formAlumno');
+        const fechaAltaInput = document.getElementById('Fecha_Alta');
+        const fechaBajaInput = document.getElementById('Fecha_Baja');
 
-            btnModificar.addEventListener('click', function() {
-                const seleccionados = document.querySelectorAll('.alumno-checkbox:checked');
+        btnModificar.addEventListener('click', function() {
+            const seleccionados = document.querySelectorAll('.alumno-checkbox:checked');
 
-                if (seleccionados.length !== 1) {
-                    alert('Por favor, seleccione una única fila para modificar.');
-                    return;
-                }
+            if (seleccionados.length !== 1) {
+                alert('Por favor, seleccione una única fila para modificar.');
+                return;
+            }
 
-                const checkbox = seleccionados[0];
-                // Usamos la función existente 'editarAlumno' con los datos del checkbox
-                editarAlumno(
-                    checkbox.dataset.dni,
-                    checkbox.dataset.nombre,
-                    checkbox.dataset.apellido,
-                    checkbox.dataset.telefono,
-                    checkbox.dataset.fechaalta,
-                    checkbox.dataset.estado,
-                    checkbox.dataset.fechabaja
-                );
-            });
-
-            btnEliminar.addEventListener('click', function() {
-                const seleccionados = document.querySelectorAll('.alumno-checkbox:checked');
-
-                if (seleccionados.length === 0) {
-                    alert('Por favor, seleccione al menos una fila para eliminar.');
-                    return;
-                }
-
-                const confirmacion = confirm(`¿Está seguro de que desea eliminar ${seleccionados.length} alumno(s) seleccionado(s)?`);
-
-                if (confirmacion) {
-                    const dnis = Array.from(seleccionados).map(cb => cb.value);
-                    // Redirigimos a la página con los DNIs a eliminar
-                    window.location.href = `?action=delete_multiple&dnis=${dnis.join(',')}`;
-                }
-            });
+            const checkbox = seleccionados[0];
+            editarAlumno(
+                checkbox.dataset.dni,
+                checkbox.dataset.nombre,
+                checkbox.dataset.apellido,
+                checkbox.dataset.telefono,
+                checkbox.dataset.fechaalta,
+                checkbox.dataset.estado,
+                checkbox.dataset.fechabaja
+            );
         });
-    </script>
+
+        btnEliminar.addEventListener('click', function() {
+            const seleccionados = document.querySelectorAll('.alumno-checkbox:checked');
+
+            if (seleccionados.length === 0) {
+                alert('Por favor, seleccione al menos una fila para eliminar.');
+                return;
+            }
+
+            const confirmacion = confirm(`¿Está seguro de que desea eliminar ${seleccionados.length} alumno(s) seleccionado(s)?`);
+
+            if (confirmacion) {
+                const dnis = Array.from(seleccionados).map(cb => cb.value);
+                window.location.href = `?action=delete_multiple&dnis=${dnis.join(',')}`;
+            }
+        });
+
+        // 🔒 Restricción dinámica: Fecha Baja no puede ser menor que Fecha Alta
+        fechaAltaInput.addEventListener('change', function () {
+            if (fechaAltaInput.value) {
+                const minimoAbsoluto = '2025-01-01';
+                fechaBajaInput.min = (fechaAltaInput.value > minimoAbsoluto) ? fechaAltaInput.value : minimoAbsoluto;
+            }
+        });
+
+        formAlumno.addEventListener('submit', function (e) {
+            const alta = new Date(fechaAltaInput.value);
+            const baja = new Date(fechaBajaInput.value);
+            const limite = new Date('2025-01-01');
+
+            if (fechaBajaInput.value) {
+                if (baja < limite) {
+                    alert('La Fecha de Baja no puede ser anterior al 1 de enero de 2025.');
+                    e.preventDefault();
+                } else if (baja < alta) {
+                    alert('La Fecha de Baja no puede ser anterior a la Fecha de Alta.');
+                    e.preventDefault();
+                }
+            }
+        });
+    });
+</script>
 
 </body>
-
 </html>
